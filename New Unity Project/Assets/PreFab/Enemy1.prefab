@@ -1,62 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2792285754221943127
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1313163665299736532}
-  - component: {fileID: 1891813764826132241}
-  m_Layer: 10
-  m_Name: StopMovement
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1313163665299736532
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2792285754221943127}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.25, y: 0.25, z: 1}
-  m_Children: []
-  m_Father: {fileID: 5235947114481758136}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &1891813764826132241
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2792285754221943127}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 0.75, y: 0.75}
-  m_EdgeRadius: 0
 --- !u!1 &5348724683580191340
 GameObject:
   m_ObjectHideFlags: 0
@@ -75,7 +18,7 @@ GameObject:
   - component: {fileID: 2719592112522763703}
   - component: {fileID: 4022722909163809125}
   - component: {fileID: 6798756322398977598}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Enemy1
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -92,8 +35,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -4.6159687}
   m_LocalScale: {x: 4, y: 4, z: 1}
-  m_Children:
-  - {fileID: 1313163665299736532}
+  m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -223,7 +165,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 924ba936744f8ca418d6c7463e98f1c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveTime: 0.01
   blockingLayer:
     serializedVersion: 2
     m_Bits: 256
@@ -236,12 +177,12 @@ MonoBehaviour:
   playerDetector: {fileID: 2719592112522763703}
   unitDetector: {fileID: 4022722909163809125}
   stun: 0
-  knockbacked: 0
   item0: {fileID: 8323507228865254196, guid: ab14115b963959e4ebfc573266b65408, type: 3}
   item1: {fileID: 1359439587538965737, guid: 309361880b85d3242b4af3de66d85272, type: 3}
   item2: {fileID: 2730691914791176633, guid: bc1952c171eed6c44a008c900b293a04, type: 3}
   item3: {fileID: 5594298711738343478, guid: c8267fccf133b30478d1fa70b247f0dc, type: 3}
   item4: {fileID: 8772223606255689455, guid: 02a9f371d73b0af43873d9ccc3295946, type: 3}
+  itemNum: 0
   clips:
   - {fileID: 8300000, guid: b316127999dfc1747a45b4646e5fdbc3, type: 3}
   - {fileID: 8300000, guid: d511a26c8775db34eb6389f3c16e15c0, type: 3}

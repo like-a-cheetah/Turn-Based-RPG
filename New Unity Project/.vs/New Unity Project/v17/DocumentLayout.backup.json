@@ -1,9 +1,9 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\klgg1\\Desktop\\20184009_\uAE40\uC8FC\uC6D0_\uAC9C\uD504\uC911\uAC04-3\\New Unity Project\\",
+  "WorkspaceRootPath": "C:\\Users\\klgg1\\Desktop\\Turn-Based-RPG\\New Unity Project\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{B2B58FB2-4462-6B0C-A872-40DD957E5FE0}|Assembly-CSharp.csproj|c:\\users\\klgg1\\desktop\\20184009_\uAE40\uC8FC\uC6D0_\uAC9C\uD504\uC911\uAC04-3\\new unity project\\assets\\scripts\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{B2B58FB2-4462-6B0C-A872-40DD957E5FE0}|Assembly-CSharp.csproj|c:\\users\\klgg1\\desktop\\turn-based-rpg\\new unity project\\assets\\scripts\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B2B58FB2-4462-6B0C-A872-40DD957E5FE0}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -20,11 +20,11 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Player.cs",
-              "DocumentMoniker": "C:\\Users\\klgg1\\Desktop\\20184009_\uAE40\uC8FC\uC6D0_\uAC9C\uD504\uC911\uAC04-3\\New Unity Project\\Assets\\Scripts\\Player.cs",
+              "DocumentMoniker": "C:\\Users\\klgg1\\Desktop\\Turn-Based-RPG\\New Unity Project\\Assets\\Scripts\\Player.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\Player.cs",
-              "ToolTip": "C:\\Users\\klgg1\\Desktop\\20184009_\uAE40\uC8FC\uC6D0_\uAC9C\uD504\uC911\uAC04-3\\New Unity Project\\Assets\\Scripts\\Player.cs",
+              "ToolTip": "C:\\Users\\klgg1\\Desktop\\Turn-Based-RPG\\New Unity Project\\Assets\\Scripts\\Player.cs",
               "RelativeToolTip": "Assets\\Scripts\\Player.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAADwvxcAAAAcAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvxIAAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-29T18:21:34.577Z",
               "EditorCaption": ""
