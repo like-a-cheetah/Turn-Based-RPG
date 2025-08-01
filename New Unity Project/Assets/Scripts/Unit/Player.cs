@@ -84,38 +84,6 @@ public class Player : MovingObject
         anim.SetFloat("inputY", vertical);
         anim.SetBool("ismove", false);
 
-        //if (HP <= 0)  //체력이 0이라면 결과 패널 출력
-        //{
-        //    GameManager.instance.playersTurn = false;
-        //    if (!death) //사망 처리를 한 번만 일어나도록 함
-        //    {
-        //        animator.SetBool("death", true);
-        //        death = true;
-
-        //        radio.clip = clips[2];
-        //        radio.Play();
-
-        //        StartCoroutine(GameManager.result());
-        //        return;
-        //    }
-        //}
-
-        //if (useSword)   //검 장착시에는 공격력이 올라감
-        //{
-        //    power = 3;
-        //    Debug.Log("무기 장착");
-        //}
-        //else
-        //    power = 1;
-
-        if (!GameManager.instance.playersTurn)  //플레이어의 턴일 경우 색이 바뀜
-        {
-            this.GetComponent<SpriteRenderer>().color = new Color(150 / 255f, 150 / 255f, 150 / 255f);
-            return;
-        }
-        else
-            this.GetComponent<SpriteRenderer>().color = Color.white;
-
         //LShift + 방향키를 누르는 방향으로 플레이어 캐릭터가 바라보게 된다.
         if (Input.GetKey(KeyCode.LeftShift) && (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.UpArrow) 
             || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.Home) 
@@ -150,15 +118,22 @@ public class Player : MovingObject
             else
                 food--; //모든 동작시 포만감이 줄어듦
 
-            GameManager.instance.playersTurn = false;
+            //GameManager.instance.playersTurn = false;
 
-            AttemptMove<Enemy>(horizontal, vertical);
+            bool successMove = Move(horizontal, vertical);
 
             Vector2 targetPos = transform.position;
             targetPos.x += horizontal;
             targetPos.y += vertical;
 
-            onMoveStart.Invoke(targetPos);
+            if (successMove)
+            {
+                onMoveStart.Invoke(targetPos);
+            }
+            else
+            {
+                moveEnd = true;
+            }
         }
     }
 
@@ -175,15 +150,6 @@ public class Player : MovingObject
         }
     }
 
-    protected override bool Move(int xDir, int yDir, out RaycastHit2D hit)
-    {
-        bool isMove = base.Move(xDir, yDir, out hit);
-
-        if(isMove) onMoveStart.Invoke(moveEndPos);
-
-        return isMove;
-    }
-
     //public IEnumerator EnemyTurn()
     //{
     //    GameManager.instance.playersTurn = false;
@@ -193,45 +159,36 @@ public class Player : MovingObject
     //    GameManager.instance.playersTurn = true;
     //}
 
-
-    protected override void AttemptMove<T> (int xDir, int yDir)
-    {
-        if(!Input.GetKeyDown(KeyCode.Space))
-            anim.SetBool("ismove", true);
-
-        base.AttemptMove <T>(xDir, yDir);
-    }
-
     private void OnTriggerEnter2D(Collider2D other)
     {   //각 아이템을 줍는다. 플레이어 오브젝트의 자식에 다른 오브젝트도 있기 때문에 두번 동작하여
         //두번 동작한 값으로 개수가 올라감
-        if (other.tag == "Exit1")
-        {
-            radio.clip = clips[3];  //레벨 오르는 사운드 출력
-            radio.Play();
+        //if (other.tag == "Exit1")
+        //{
+        //    radio.clip = clips[3];  //레벨 오르는 사운드 출력
+        //    radio.Play();
 
-            GameManager.changeGrid = true;
-            GameManager.NextFloor();
-            Debug.Log("다음 단계");
-        }
-        else if (other.tag == "Exit2")
-        {
-            radio.clip = clips[3];  //레벨 오르는 사운드 출력
-            radio.Play();
+        //    GameManager.changeGrid = true;
+        //    GameManager.NextFloor();
+        //    Debug.Log("다음 단계");
+        //}
+        //else if (other.tag == "Exit2")
+        //{
+        //    radio.clip = clips[3];  //레벨 오르는 사운드 출력
+        //    radio.Play();
 
-            GameManager.changeGrid = true;
-            GameManager.NextFloor2();
-            Debug.Log("다음 단계");
-        }
-        else if (other.tag == "Exit3")
-        {
-            radio.clip = clips[3];  //레벨 오르는 사운드 출력
-            radio.Play();
+        //    GameManager.changeGrid = true;
+        //    GameManager.NextFloor2();
+        //    Debug.Log("다음 단계");
+        //}
+        //else if (other.tag == "Exit3")
+        //{
+        //    radio.clip = clips[3];  //레벨 오르는 사운드 출력
+        //    radio.Play();
 
-            GameManager.changeGrid = true;
-            GameManager.NextFloor3();
-            Debug.Log("다음 단계");
-        }
+        //    GameManager.changeGrid = true;
+        //    GameManager.NextFloor3();
+        //    Debug.Log("다음 단계");
+        //}
     }
 
     protected override void OnCantMove<T> (T component)
@@ -301,11 +258,11 @@ public class Player : MovingObject
 
       //  bowPoint -= 1;
         
-        GameManager.playersTurn = false;
+        //GameManager.playersTurn = false;
 
         yield return new WaitWhile(() => arrowExist == true);
 
-        GameManager.playersTurn = true;
+        //GameManager.playersTurn = true;
 
        // yield return StartCoroutine(EnemyTurn());
     }
@@ -327,11 +284,11 @@ public class Player : MovingObject
 
        // bowPoint -= 1;
 
-        GameManager.playersTurn = false;
+        //GameManager.playersTurn = false;
 
         yield return new WaitWhile(() => arrowExist == true);
 
-        GameManager.playersTurn = true;
+        //GameManager.playersTurn = true;
 
     //    yield return StartCoroutine(EnemyTurn());
     }
@@ -369,7 +326,7 @@ public class Player : MovingObject
 
         //inven[bowPoint -= 1;
 
-        GameManager.playersTurn = false;
+        //GameManager.playersTurn = false;
 
         yield return new WaitWhile(() => arrowExist == true);
 
@@ -378,7 +335,7 @@ public class Player : MovingObject
 
     public IEnumerator MagicAttack()
     {
-        GameManager.playersTurn = false;
+        //GameManager.playersTurn = false;
 
         yield return new WaitWhile(() => endBomb == false);
 
@@ -391,6 +348,6 @@ public class Player : MovingObject
         food = 20;
         animator.SetBool("death", false);
         death = false;
-        GameManager.instance.playersTurn = true;
+        //GameManager.instance.playersTurn = true;
     }
 }

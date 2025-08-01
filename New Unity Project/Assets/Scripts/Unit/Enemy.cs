@@ -109,22 +109,9 @@ public class Enemy : MovingObject
         }
     }
 
-    protected override void AttemptMove<T>(int xDir, int yDir)
-    {
-        if (xDir == 0 && yDir == 0)
-            anim.SetBool("ismove", false);
-        else
-            anim.SetBool("ismove", true);
-
-        anim.SetFloat("inputX", xDir);
-        anim.SetFloat("inputY", yDir);
-        base.AttemptMove<T>(xDir, yDir);
-    }
-
     public void Patrol()
     {
         Vector2 dir = RandomDirection();
-        AttemptMove<Enemy>((int)dir.x, (int)dir.y);
     }
 
     public void Trace(Vector2 PlayerTargetPos)
@@ -159,7 +146,6 @@ public class Enemy : MovingObject
             }
             attackX = xDir;
             attackY = yDir;
-            AttemptMove<Player>(xDir, yDir);
         }
         else
         {
@@ -168,15 +154,11 @@ public class Enemy : MovingObject
             yDir = (int)direction.y;
             prePosition = transform.position;   //이동하기 전의 위치 저장
 
-            AttemptMove<Player>(xDir, yDir);    //이동
-
             while ((prePosition == transform.position) && count < 10)  //이동한 위치가 제자리라면
             {
                 direction = RandomDirection(); //다시 방향 조정
                 xDir = (int)direction.x;
                 yDir = (int)direction.y;
-
-                AttemptMove<Player>(xDir, yDir);
 
                 count++;
             }

@@ -7,12 +7,12 @@ public class Room : MonoBehaviour
     public GameObject wall;
     public GameObject road;
 
-    public Rigidbody2D rb;
-    public BoxCollider2D collider;
+    private Rigidbody2D rb;
+    private BoxCollider2D collider;
 
     public int width;
     public int height;
-
+    
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -37,13 +37,13 @@ public class Room : MonoBehaviour
         CreateWall();
     }
 
-    public void OverlapCheckColliderMake()
+    private void OverlapCheckColliderMake()
     {
         collider.size = new Vector2(width, height);
         collider.offset = new Vector2((float)width / 2 - 0.5f, (float)height / 2 - 0.5f);
     }
 
-    public void CreateWall()
+    private void CreateWall()
     {
         Vector2 startPos = transform.position;
 
@@ -81,7 +81,7 @@ public class Room : MonoBehaviour
                 Vector2 spawnPos = startPos + new Vector2(i, j);
                 Instantiate(road, spawnPos, Quaternion.identity, this.transform);
 
-                map[(int)spawnPos.y, (int)spawnPos.x] = ETile.None;
+                map[(int)spawnPos.y, (int)spawnPos.x] = ETile.Empty;
             }
         }
     }
@@ -96,5 +96,28 @@ public class Room : MonoBehaviour
         Physics2D.SyncTransforms();
 
         return collider.OverlapCollider(filter, results) > 0;
+    }
+
+    public Vector2 GetRandomTilePos(ETile[,] map)
+    {
+        Vector2 randomPos = new Vector2(-1, -1);
+
+        Vector2Int start = Vector2Int.FloorToInt(transform.position);
+
+        List<Vector2Int> EmptyList = new List<Vector2Int>();
+        for (int x = start.x; x < start.x + width; x++)
+        {
+            for (int y = start.y; y < start.y + height; y++)
+            {
+                if(map[y, x] == ETile.Empty)
+                {
+                    EmptyList.Add(new Vector2Int(x, y));
+                }
+            }
+        }
+
+        if(EmptyList.Count > 0) randomPos = EmptyList[Random.Range(0, EmptyList.Count)];
+
+        return randomPos;
     }
 }

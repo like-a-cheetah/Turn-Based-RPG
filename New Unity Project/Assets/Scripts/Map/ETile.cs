@@ -1,7 +1,7 @@
 ﻿public enum ETile
 {
     Wall,
-    None,
+    Empty,
     Player,
     Monster
 }

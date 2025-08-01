@@ -45,6 +45,8 @@ public class GameManager : MonoBehaviour
     public GameObject resultPanel;
     public GameObject VictoryPanel;
 
+    public Vector2 StartPos;
+
     void Awake()
     {
         floorLevel = 1;

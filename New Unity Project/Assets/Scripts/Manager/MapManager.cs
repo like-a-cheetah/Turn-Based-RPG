@@ -8,8 +8,9 @@ public class MapManager : MonoBehaviour
 {
     private ETile[,] map;
 
-    public GameObject room;
-    public List<Room> rooms;
+    [SerializeField] public Room room;
+    [SerializeField] public Player playerPrefab;
+    private List<Room> rooms;
 
     private int floor = 1;
 
@@ -23,27 +24,74 @@ public class MapManager : MonoBehaviour
     private int roomMinN = 4;
     private int roomN;
     
-    private GameObject roomContainer;
+    private GameObject gameMap;
 
     const int maxRoomMakeAttempts = 100;
 
     private void Awake()
     {
         map = new ETile[mapHeight, mapWidth];
+        rooms = new List<Room>();
 
-        roomContainer = new GameObject("RoomContainer");
+        gameMap = new GameObject("RoomContainer");
 
         roomN = Random.Range(roomMinN, roomMaxN[floor] + 1);
     }
 
     void Start()
     {
+        Enemy.onDeath += TileClear;
+
         GenerateRooms();
+
+        CreatePlayer();
     }
 
     void Update()
     {
-        DebugMapSpace();
+        //DebugMapSpace();
+    }
+
+    public void TileClear(Enemy enemy)
+    {
+        TileClear(enemy.transform.position);
+    }
+
+    public void TileClear(Vector2 pos)
+    {
+        Vector2Int clearPos = Vector2Int.FloorToInt(pos);
+
+        int rows = map.GetLength(0);
+        int cols = map.GetLength(1);
+
+        if (map == null || clearPos.y < 0 || clearPos.y >= rows || clearPos.x < 0 || clearPos.x >= cols)
+        {
+            Debug.LogError("타일 청소 실패");
+            return;
+        }
+
+        map[clearPos.y, clearPos.x] = ETile.Empty;
+    }
+
+    public void SetTile(Vector2 pos, ETile newTileCondition)
+    {
+        Vector2Int clearPos = Vector2Int.FloorToInt(pos);
+
+        int rows = map.GetLength(0);
+        int cols = map.GetLength(1);
+
+        if (map == null || clearPos.y < 0 || clearPos.y >= rows || clearPos.x < 0 || clearPos.x >= cols)
+        {
+            Debug.LogError("타일 청소 실패");
+            return;
+        }
+
+        map[clearPos.y, clearPos.x] = newTileCondition;
+    }
+
+    public ETile GetTileCondition(Vector2 pos)
+    {
+        return map[(int)pos.y, (int)pos.x];
     }
 
     private void GenerateRooms()
@@ -51,6 +99,7 @@ public class MapManager : MonoBehaviour
         for (int i = 0; i < roomN; i++)
         {
             Room newRoom = InstantiateRandomRoom();
+            rooms.Add(newRoom);
 
             Vector2Int startVector = new Vector2Int(newRoom.width, newRoom.height);
             Vector2Int endVector = new Vector2Int(mapWidth - newRoom.width - 1, mapHeight - newRoom.height - 1);
@@ -75,8 +124,7 @@ public class MapManager : MonoBehaviour
         int roomWidth = Random.Range(roomMinLine, roomMaxLine);
         int roomHeight = Random.Range(roomMinLine, roomMaxLine);
 
-        GameObject roomObj = Instantiate(room, transform.position, Quaternion.identity, roomContainer.transform);
-        Room newRoom = roomObj.GetComponent<Room>();
+        Room newRoom = Instantiate<Room>(room, transform.position, Quaternion.identity, gameMap.transform);
         newRoom.width = roomWidth;
         newRoom.height = roomHeight;
 
@@ -120,5 +168,15 @@ public class MapManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void CreatePlayer()
+    {
+        int startRoomN = Random.Range(0, roomN);
+
+        Vector2 startPos = rooms[startRoomN].GetRandomTilePos(map);
+        map[(int)startPos.y, (int)startPos.x] = ETile.Player;
+
+        Instantiate<Player>(playerPrefab, startPos, Quaternion.identity, gameMap.transform);
     }
 }

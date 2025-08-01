@@ -322,11 +322,6 @@ MonoBehaviour:
   vertical: 0
   food: 20
   HP: 10
-  healPoint: 0
-  foodPoint: 0
-  swordPoint: 0
-  magicPoint: 0
-  bowPoint: 0
   useSword: 0
   useBow: 0
   arrowExist: 0
@@ -341,6 +336,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 2f83bad8d59b19b40b586dc7aac57bcb, type: 3}
   - {fileID: 8300000, guid: 3a7e7fc0f7502584f98affd1fe37ceb7, type: 3}
   - {fileID: 8300000, guid: 7124c3a2ee5cde744a4a3a1133f90c80, type: 3}
+  - {fileID: 8300000, guid: 82729df3ca36bc944a1de33f4c00be16, type: 3}
   death: 0
 --- !u!82 &1889130068
 AudioSource:

@@ -23,6 +23,9 @@ public abstract class MovingObject : MonoBehaviour
 
     protected bool moveEnd = true;
 
+    private delegate ETile GetTileCondition(Vector2 pos);
+    private GetTileCondition onGetTileCondition;
+
     protected virtual void Start()
     {
         gameManager = GameObject.Find("GameManager");
@@ -32,32 +35,29 @@ public abstract class MovingObject : MonoBehaviour
         //radio.clip = gameManager.GetComponent<GameManager>().clips[0];
 
         blockingLayer = LayerMask.GetMask("Wall");
+
+        MapManager mapManager = FindObjectOfType<MapManager>();
+        onGetTileCondition += mapManager.GetTileCondition;
     }
 
-    protected virtual bool Move (int xDir, int yDir, out RaycastHit2D hit)
+    protected virtual bool Move (int xDir, int yDir)
     {
         Vector2 start = transform.position;
-        Vector2 end = start + new Vector2(xDir, yDir);
-        
-        boxCollider.enabled = false;
-        hit = Physics2D.Linecast(start, end, blockingLayer);
-        boxCollider.enabled = true;
+        Vector2 movePos = new Vector2(start.x + xDir, start.y + yDir);
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        ETile tileCondition = onGetTileCondition.Invoke(movePos);
+        if (tileCondition == ETile.Wall)
         {
-            StartCoroutine(attack(xDir/2, yDir/2));
             return false;
         }
-
-        if(hit.transform == null)
+        else if(tileCondition == ETile.Empty)
         {
-            moveEndPos = end;
-            StartCoroutine(SmoothMovement(end));
-            return true;
+            StartCoroutine(SmoothMovement(movePos));
         }
 
-        moveEndPos = start;
-        return false;
+        moveEndPos = movePos;
+
+        return true;
     }
 
     protected IEnumerator SmoothMovement(Vector3 end)
@@ -77,26 +77,6 @@ public abstract class MovingObject : MonoBehaviour
 
         transform.position = end;
         moveEnd = true;
-        Debug.Log(name + " : End");
-    }
-
-    protected virtual void AttemptMove <T> (int xDir, int yDir)
-        where T : Component
-    {
-        RaycastHit2D hit;
-        bool canMove = Move(xDir, yDir, out hit);
-
-        if (hit.transform == null)
-            return;
-        
-        T hitComoponent = hit.transform.GetComponent<T>();
-        
-
-        if (!canMove && hitComoponent != null)
-        {
-            OnCantMove(hitComoponent);
-            StartCoroutine(attack(xDir, yDir));
-        }
     }
 
     protected abstract void OnCantMove<T>(T component)
