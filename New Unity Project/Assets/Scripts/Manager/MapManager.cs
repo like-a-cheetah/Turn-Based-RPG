@@ -6,6 +6,8 @@ using System.Linq;
 
 public class MapManager : MonoBehaviour
 {
+    public static MapManager Instance { get; private set; }
+
     private ETile[,] map;
 
     [SerializeField] public Room room;
@@ -21,6 +23,7 @@ public class MapManager : MonoBehaviour
     private const int roomMaxLine = 10;
 
     private int[] roomMaxN = { 4, 6, 8 };
+    private int[] enemyMaxN = { 5, 8, 12 };
     private int roomMinN = 4;
     private int roomN;
     
@@ -28,8 +31,19 @@ public class MapManager : MonoBehaviour
 
     const int maxRoomMakeAttempts = 100;
 
+    [SerializeField] public Enemy[] enemiesPF;
+
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject); // 중복 방지
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
         map = new ETile[mapHeight, mapWidth];
         rooms = new List<Room>();
 
@@ -45,6 +59,16 @@ public class MapManager : MonoBehaviour
         GenerateRooms();
 
         CreatePlayer();
+
+        GeneratesEnemies();
+        
+        MovingObject.onMoveUnit += (MovingObject obj, Vector2 moveDir) =>
+        {
+            Vector2 startPos = obj.transform.position;
+            TileClear(startPos);
+            SetTile(startPos + moveDir, obj.tileType);
+        };
+        //Player.onMoveStart += (Vector2 TargetPos) => { SetTile(TargetPos, ETile.Player); };
     }
 
     void Update()
@@ -59,7 +83,7 @@ public class MapManager : MonoBehaviour
 
     public void TileClear(Vector2 pos)
     {
-        Vector2Int clearPos = Vector2Int.FloorToInt(pos);
+        Vector2Int clearPos = Vector2Int.RoundToInt(pos);
 
         int rows = map.GetLength(0);
         int cols = map.GetLength(1);
@@ -75,7 +99,7 @@ public class MapManager : MonoBehaviour
 
     public void SetTile(Vector2 pos, ETile newTileCondition)
     {
-        Vector2Int clearPos = Vector2Int.FloorToInt(pos);
+        Vector2Int clearPos = Vector2Int.RoundToInt(pos);
 
         int rows = map.GetLength(0);
         int cols = map.GetLength(1);
@@ -166,6 +190,10 @@ public class MapManager : MonoBehaviour
                     Debug.DrawLine(center - Vector3.right * size, center + Vector3.right * size, Color.red);
                     Debug.DrawLine(center - Vector3.up * size, center + Vector3.up * size, Color.red);
                 }
+                else if (map[y, x] == ETile.Player)
+                {
+                    Debug.Log(x + y + "player");
+                }
             }
         }
     }
@@ -175,8 +203,26 @@ public class MapManager : MonoBehaviour
         int startRoomN = Random.Range(0, roomN);
 
         Vector2 startPos = rooms[startRoomN].GetRandomTilePos(map);
-        map[(int)startPos.y, (int)startPos.x] = ETile.Player;
 
         Instantiate<Player>(playerPrefab, startPos, Quaternion.identity, gameMap.transform);
+    }
+
+    private void GeneratesEnemies()
+    {
+        int enemyN = enemyMaxN[floor];
+
+        for(int i=0; i<enemyN; i++)
+        {
+            Vector2 randPos;
+            do
+            {
+                int randRoomN = Random.Range(0, roomN);
+
+                randPos = rooms[randRoomN].GetRandomTilePos(map);
+            }
+            while (randPos == new Vector2(-1, -1));
+
+            Instantiate<Enemy>(enemiesPF[0], randPos, Quaternion.identity, gameMap.transform);
+        }
     }
 }

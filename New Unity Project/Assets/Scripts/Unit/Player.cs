@@ -49,8 +49,15 @@ public class Player : MovingObject
 
     private Dictionary<EItem, OnItemUse> itemActions;
 
+    protected override void Awake()
+    {
+        tileType = ETile.Player;
+    }
+
     protected override void Start()
     {
+        tileType = ETile.Player;
+
         HP = 10;
         food = 20;
         power = 1;
@@ -80,30 +87,16 @@ public class Player : MovingObject
 
     void Update()
     {
-        anim.SetFloat("inputX", horizontal);
-        anim.SetFloat("inputY", vertical);
         anim.SetBool("ismove", false);
-
-        //LShift + 방향키를 누르는 방향으로 플레이어 캐릭터가 바라보게 된다.
-        if (Input.GetKey(KeyCode.LeftShift) && (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.UpArrow) 
-            || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.Home) 
-            || Input.GetKey(KeyCode.End) || Input.GetKey(KeyCode.PageDown) || Input.GetKey(KeyCode.PageUp)))
-        {
-            horizontal = (int)Input.GetAxisRaw("Horizontal");
-            vertical = (int)Input.GetAxisRaw("Vertical");
-            return;
-        }
+        
+        horizontal = (int)Input.GetAxisRaw("Horizontal");
+        vertical = (int)Input.GetAxisRaw("Vertical");
 
         //대각선 방향으로 이동이 가능하게 할 수 있도록 프로젝트 세팅에서 텐키에서 home, pu, pd, end, insert로
         //horizontal, vertical의 값을 변경 가능하게 만듦,
-        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKey(KeyCode.Home) || Input.GetKey(KeyCode.End) || 
-            Input.GetKey(KeyCode.PageDown) || Input.GetKey(KeyCode.PageUp) || Input.GetKey(KeyCode.UpArrow) || 
-            Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow)) && moveEnd)
+        if (!(horizontal == 0 && vertical == 0) && moveEnd)
         {
             moveEnd = false;
-
-            horizontal = (int)Input.GetAxisRaw("Horizontal");
-            vertical = (int)Input.GetAxisRaw("Vertical");
 
             Vector2 moveDir = new Vector2(horizontal, vertical);
             
@@ -128,6 +121,8 @@ public class Player : MovingObject
 
             if (successMove)
             {
+                anim.SetFloat("inputX", horizontal);
+                anim.SetFloat("inputY", vertical);
                 onMoveStart.Invoke(targetPos);
             }
             else

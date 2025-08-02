@@ -102,7 +102,7 @@ public class Room : MonoBehaviour
     {
         Vector2 randomPos = new Vector2(-1, -1);
 
-        Vector2Int start = Vector2Int.FloorToInt(transform.position);
+        Vector2Int start = Vector2Int.RoundToInt(transform.position);
 
         List<Vector2Int> EmptyList = new List<Vector2Int>();
         for (int x = start.x; x < start.x + width; x++)

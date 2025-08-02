@@ -17,6 +17,8 @@ using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance { get; private set; }
+
     private float floorLevel;
 
     public GameObject f1;
@@ -49,6 +51,15 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject); // 중복 방지
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
         floorLevel = 1;
 
         if (instance == null)
@@ -64,7 +75,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        Player.onMoveStart += PlayerStartMove;
+        Player.onMoveStart += StartEnemiesMove;
         //Player.onMoveEnd += PlayerStartMove;
     }
 
@@ -82,15 +93,16 @@ public class GameManager : MonoBehaviour
         enemies.Remove(deathEnemy);
     }
 
-    private void PlayerStartMove(Vector2 PlayerTargetPos)
+    private void StartEnemiesMove(Vector2 PlayerTargetPos)
     {
         List<Enemy> CanAttackEnemies = new List<Enemy>();
+        Stack<Enemy> patrolFailedEnemies = new Stack<Enemy>();
 
         foreach(var enemy in enemies)
         {
-            if(enemy.playerDetector.PlayerDetected)
+            if (enemy.playerDetector.PlayerDetected)
             {
-                if(!enemy.CanAttack(PlayerTargetPos))   //추적
+                if (!enemy.CanAttack(PlayerTargetPos))   //추적
                 {
                     //enemy.Trace(PlayerTargetPos);
                 }
@@ -101,8 +113,17 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                enemy.Patrol();
-            }            
+                if (!enemy.Patrol())
+                {
+                    patrolFailedEnemies.Push(enemy);
+                }
+            }
+        }
+
+        while(patrolFailedEnemies.Count != 0)
+        {
+            Enemy failedEnemy = patrolFailedEnemies.Pop();
+            failedEnemy.Patrol();
         }
 
         foreach (var enemy in CanAttackEnemies) //공격

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class MovingObject : MonoBehaviour
 {
-    private float moveTime = .5f;
+    private float moveTime = .4f;
     public LayerMask blockingLayer;
 
     private BoxCollider2D boxCollider;
@@ -26,8 +26,19 @@ public abstract class MovingObject : MonoBehaviour
     private delegate ETile GetTileCondition(Vector2 pos);
     private GetTileCondition onGetTileCondition;
 
+    public delegate void OnMoveUnit(MovingObject unit, Vector2 moveDir);
+    static public OnMoveUnit onMoveUnit;
+
+    public ETile tileType { get; protected set; }
+
+    protected virtual void Awake()
+    {
+    }
+
     protected virtual void Start()
     {
+        MapManager.Instance.SetTile(transform.position, tileType);
+
         gameManager = GameObject.Find("GameManager");
         animator = GetComponent<Animator>();
         boxCollider = GetComponent<BoxCollider2D>();
@@ -50,8 +61,9 @@ public abstract class MovingObject : MonoBehaviour
         {
             return false;
         }
-        else if(tileCondition == ETile.Empty)
+        else if(tileCondition == ETile.Empty || tileCondition == ETile.Player)
         {
+            onMoveUnit(this, new Vector2(xDir, yDir));
             StartCoroutine(SmoothMovement(movePos));
         }
 
@@ -71,10 +83,12 @@ public abstract class MovingObject : MonoBehaviour
             current += Time.deltaTime;  
             percent = current / moveTime;
             transform.position = Vector3.Lerp(start, end, percent);
-
+            
             yield return null;
         }
 
+        end.x = Mathf.RoundToInt(end.x);
+        end.y = Mathf.RoundToInt(end.y);
         transform.position = end;
         moveEnd = true;
     }

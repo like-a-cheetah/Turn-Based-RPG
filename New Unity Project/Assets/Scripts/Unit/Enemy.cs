@@ -66,6 +66,12 @@ public class Enemy : MovingObject
 
     public static OnDeathDelegate onDeath;
 
+    protected override void Awake()
+    {
+        tileType = ETile.Monster;
+        GameManager.Instance.enemies.Add(this);
+    }
+
     protected override void Start()
     {
         preX = transform.position.x;
@@ -109,65 +115,22 @@ public class Enemy : MovingObject
         }
     }
 
-    public void Patrol()
+    public bool Patrol()
     {
-        Vector2 dir = RandomDirection();
+        Vector2Int dir = RandomDirection();
+
+        if (dir == Vector2Int.zero)
+            return false;
+
+        Debug.Log("Patrol" + dir);
+        Move(dir.x, dir.y);
+
+        return true;
     }
 
     public void Trace(Vector2 PlayerTargetPos)
     {
 
-    }
-
-    public void MoveEnemy() //이동 방향 정하는 함수
-    {
-        if (HP <= 0)
-            return;
-
-        int xDir = 0;
-        int yDir = 0;
-        int count = 0;
-
-        if (playerDetector.PlayerDetected)  //AIfollower
-        {
-            if (Mathf.Abs(target.position.x - transform.position.x) < float.Epsilon)    //현재 x값이 같음(y값은 다르다는 것)
-                yDir = target.position.y > transform.position.y ? 1 : -1;
-            else    //현재 x값이 다름(y값은 같을 수 있다는 것)
-            {
-                if (Mathf.Abs(target.position.y - transform.position.y) < float.Epsilon)
-                {
-                    xDir = target.position.x > transform.position.x ? 1 : -1;
-                }
-                else
-                {
-                    xDir = target.position.x > transform.position.x ? 1 : -1;
-                    yDir = target.position.y > transform.position.y ? 1 : -1;
-                }
-            }
-            attackX = xDir;
-            attackY = yDir;
-        }
-        else
-        {
-            Vector2 direction = RandomDirection();
-            xDir = (int)direction.x;
-            yDir = (int)direction.y;
-            prePosition = transform.position;   //이동하기 전의 위치 저장
-
-            while ((prePosition == transform.position) && count < 10)  //이동한 위치가 제자리라면
-            {
-                direction = RandomDirection(); //다시 방향 조정
-                xDir = (int)direction.x;
-                yDir = (int)direction.y;
-
-                count++;
-            }
-            if (count == 4 || prePosition == transform.position)
-            {
-                Debug.Log("움직이지 못함");
-                transform.position = new Vector3(preX, preY);
-            }
-        }
     }
 
     protected override void OnCantMove<T>(T component) //점거중인 공건에 적이 이동하려 할때 호출
@@ -204,9 +167,9 @@ public class Enemy : MovingObject
         return false;
     }
 
-    private Vector2 RandomDirection()
+    private Vector2Int RandomDirection()
     {
-        Vector2 resultDir = Vector2.zero;
+        Vector2Int resultDir = Vector2Int.zero;
 
         Vector2 start = transform.position;
 
@@ -216,20 +179,21 @@ public class Enemy : MovingObject
         {
             int randN = Random.Range(0, tmpDirs.Count);
             Vector2 testDir = tmpDirs[randN];
-            
-            RaycastHit2D hit = Physics2D.Raycast(start, testDir, 1f, blockingLayer);
-            if (hit.collider != null || enemiesPos.ContainsValue(start + testDir))
+
+            Vector2 targetPos = start + testDir;
+
+            ETile targetTile = MapManager.Instance.GetTileCondition(targetPos);
+            //Debug.Log("TEST " + targetPos + " = " + targetTile);
+            if (targetTile != ETile.Empty)
             {
                 tmpDirs.Remove(testDir);
             }
             else
             {
-                resultDir = tmpDirs[randN];
+                resultDir = Vector2Int.FloorToInt(tmpDirs[randN]);
                 break;
             }
         }
-
-        enemiesPos[this] = start + resultDir;
 
         return resultDir;
     }

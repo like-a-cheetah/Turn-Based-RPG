@@ -47,6 +47,8 @@ MonoBehaviour:
   room: {fileID: 6283915227216834559, guid: 2cbf5f763a7e7b149a7b8469b1414fd2, type: 3}
   playerPrefab: {fileID: 3603622911490796112, guid: d01237c8c13ee2e449458bb0466b9a55,
     type: 3}
+  enemiesPF:
+  - {fileID: -9122568063740288560, guid: 00d48a4541751ce43b1daf5711a560c8, type: 3}
 --- !u!50 &6663228752318242638
 Rigidbody2D:
   serializedVersion: 4
