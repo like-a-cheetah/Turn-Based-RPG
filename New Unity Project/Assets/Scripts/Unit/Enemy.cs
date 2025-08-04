@@ -5,6 +5,7 @@ using UnityEngine;
 public class Enemy : MovingObject
 {
     public Animator anim;
+    private PathFindComponent pathFinder;
     private Transform target;
     private bool skipMove;
 
@@ -12,14 +13,14 @@ public class Enemy : MovingObject
     public int HP;
 
     public const float SQRT2 = 1.4142135f;
-    
+
     private static Dictionary<Enemy, Vector2> enemiesPos = new Dictionary<Enemy, Vector2>();
 
     public AIAroundDetector playerAround;
     public AIFollowDetector playerDetector;
     public AIEnemyDetector unitDetector;
 
-    private Vector2[] dirs = new Vector2[]
+    public static readonly Vector2[] dirs = new Vector2[]
     {
         new Vector2(0, 1),   // 위
         new Vector2(1, 0),   // 오른쪽
@@ -52,10 +53,6 @@ public class Enemy : MovingObject
     Vector3 movetarget;
 
     public GameObject item0;
-    public GameObject item1;
-    public GameObject item2;
-    public GameObject item3;
-    public GameObject item4;
     public int itemNum;
     
     public AudioClip[] clips;
@@ -70,6 +67,8 @@ public class Enemy : MovingObject
     {
         tileType = ETile.Monster;
         GameManager.Instance.enemies.Add(this);
+
+        pathFinder = GetComponent<PathFindComponent>();
     }
 
     protected override void Start()
@@ -121,16 +120,15 @@ public class Enemy : MovingObject
 
         if (dir == Vector2Int.zero)
             return false;
-
-        Debug.Log("Patrol" + dir);
+        
         Move(dir.x, dir.y);
 
         return true;
     }
 
-    public void Trace(Vector2 PlayerTargetPos)
+    public void Trace(Vector2 playerPos)
     {
-
+        pathFinder.PathFind(Vector2Int.RoundToInt(transform.position), Vector2Int.RoundToInt(playerPos));
     }
 
     protected override void OnCantMove<T>(T component) //점거중인 공건에 적이 이동하려 할때 호출
@@ -182,9 +180,9 @@ public class Enemy : MovingObject
 
             Vector2 targetPos = start + testDir;
 
-            ETile targetTile = MapManager.Instance.GetTileCondition(targetPos);
+            ETile targetTile = MapManager.Instance.GetTileType(targetPos);
             //Debug.Log("TEST " + targetPos + " = " + targetTile);
-            if (targetTile != ETile.Empty)
+            if (targetTile != ETile.Empty || !MapManager.Instance.CanCrossWalk(start, testDir))
             {
                 tmpDirs.Remove(testDir);
             }
@@ -226,14 +224,6 @@ public class Enemy : MovingObject
         yield return new WaitForSeconds(1.4f);
         if (itemNum == 0)
             DropItem0();
-        else if (itemNum == 1)
-            DropItem1();
-        else if (itemNum == 2)
-            DropItem2();
-        else if (itemNum == 3)
-            DropItem3();
-        else if (itemNum == 4)
-            DropItem4();
         itemNum = -1;
 
         this.GetComponent<BoxCollider2D>().enabled = false;
@@ -276,34 +266,6 @@ public class Enemy : MovingObject
     private void DropItem0()
     {
         var item = Instantiate<GameObject>(this.item0, floor.transform);
-        item.transform.position = transform.position;
-        item.SetActive(true);
-    }
-
-    private void DropItem1()
-    {
-        var item = Instantiate<GameObject>(this.item1, floor.transform);
-        item.transform.position = transform.position;
-        item.SetActive(true);
-    }
-
-    private void DropItem2()
-    {
-        var item = Instantiate<GameObject>(this.item2, floor.transform);
-        item.transform.position = transform.position;
-        item.SetActive(true);
-    }
-
-    private void DropItem3()
-    {
-        var item = Instantiate<GameObject>(this.item3, floor.transform);
-        item.transform.position = transform.position;
-        item.SetActive(true);
-    }
-
-    private void DropItem4()
-    {
-        var item = Instantiate<GameObject>(this.item4, floor.transform);
         item.transform.position = transform.position;
         item.SetActive(true);
     }

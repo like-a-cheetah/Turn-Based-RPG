@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 2719592112522763703}
   - component: {fileID: 4022722909163809125}
   - component: {fileID: 6798756322398977598}
+  - component: {fileID: 3924642493867435294}
   m_Layer: 10
   m_Name: Enemy1
   m_TagString: Enemy
@@ -178,10 +179,6 @@ MonoBehaviour:
   unitDetector: {fileID: 4022722909163809125}
   stun: 0
   item0: {fileID: 8323507228865254196, guid: ab14115b963959e4ebfc573266b65408, type: 3}
-  item1: {fileID: 1359439587538965737, guid: 309361880b85d3242b4af3de66d85272, type: 3}
-  item2: {fileID: 2730691914791176633, guid: bc1952c171eed6c44a008c900b293a04, type: 3}
-  item3: {fileID: 5594298711738343478, guid: c8267fccf133b30478d1fa70b247f0dc, type: 3}
-  item4: {fileID: 8772223606255689455, guid: 02a9f371d73b0af43873d9ccc3295946, type: 3}
   itemNum: 0
   clips:
   - {fileID: 8300000, guid: b316127999dfc1747a45b4646e5fdbc3, type: 3}
@@ -337,3 +334,15 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &3924642493867435294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5348724683580191340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f364d24610038ff48a78f06f87266cc8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

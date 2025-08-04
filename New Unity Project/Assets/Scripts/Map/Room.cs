@@ -12,6 +12,22 @@ public class Room : MonoBehaviour
 
     public int width;
     public int height;
+
+    public List<Entrance> entrances;
+
+    private bool isEndRoomReplace;
+
+    public class Entrance
+    {
+        public Vector2 dir;
+        public Vector2 pos;
+        
+        public Entrance(Vector2 inDir, Vector2 inPos)
+        {
+            dir = inDir;
+            pos = inPos;
+        }
+    }
     
     private void Awake()
     {
@@ -19,6 +35,8 @@ public class Room : MonoBehaviour
         rb.bodyType = RigidbodyType2D.Static;
 
         collider = GetComponent<BoxCollider2D>();
+
+        entrances = new List<Entrance>();
     }
 
     void Start()
@@ -27,15 +45,26 @@ public class Room : MonoBehaviour
 
     void Update()
     {
-
+        if(isEndRoomReplace)
+            DebugEntrance();
     }
 
     public void Initialize()
     {
         OverlapCheckColliderMake();
 
-        CreateWall();
+        //CreateWall();
     }
+
+    public void EndReplaceRoom()
+    {
+        GenerateRandObstacle();
+        SetEntrance();
+
+        isEndRoomReplace = true;
+    }
+
+    
 
     private void OverlapCheckColliderMake()
     {
@@ -119,5 +148,160 @@ public class Room : MonoBehaviour
         if(EmptyList.Count > 0) randomPos = EmptyList[Random.Range(0, EmptyList.Count)];
 
         return randomPos;
+    }
+
+    private void GenerateRandObstacle()
+    {
+        if (width < 3 || height < 3)
+            return;
+
+        int insideArea = (width * height) - (width * 2 + (height - 2) * 2);
+        if (insideArea >= 1)
+        {
+            int randObstacleN = Random.Range(0, insideArea + 1);
+
+            for (int i = 0; i < randObstacleN; i++)
+            {
+                Vector2Int start = Vector2Int.RoundToInt(transform.position);
+                Vector2Int end = start;
+                end.x += width;
+                end.y += height;
+
+                int tryN = 0;
+
+                int x, y;
+                Vector2 obstaclePos;
+                do
+                {
+                    x = Random.Range(start.x + 1, end.x - 1);
+                    y = Random.Range(start.y + 1, end.y - 1);
+
+                    obstaclePos = new Vector2(x, y);
+
+                    tryN++;
+                } while (MapManager.Instance.GetTileType(obstaclePos) != ETile.Wall && tryN <= 10);
+
+                Instantiate(wall, obstaclePos, Quaternion.identity, transform);
+                MapManager.Instance.SetTile(obstaclePos, ETile.Wall);
+            }
+        }
+    }
+
+    private void SetEntrance()
+    {
+        bool isSetEntrance = false;
+        int min = 0, max = 0, defaultIndex = 0;
+
+        for (int dir = 0; dir < 4; dir++)
+        {
+            if (Random.Range(0, 2) == 1)
+            {
+                isSetEntrance = true;
+
+                SetEntranceRangeFromDirection(dir, out min, out max, out defaultIndex);
+
+                CreateEntranceInRange(dir, min, max, defaultIndex);
+            }
+        }
+
+        if (!isSetEntrance)
+        {
+            int dir = Random.Range(0, 4);
+
+            SetEntranceRangeFromDirection(dir, out min, out max, out defaultIndex);
+
+            CreateEntranceInRange(dir, min, max, defaultIndex);
+        }
+    }
+
+    private void SetEntranceRangeFromDirection(int dir, out int min, out int max, out int defaultIndex)
+    {
+        Vector2Int offset = Vector2Int.FloorToInt(transform.position);
+
+        min = 0;
+        max = 0;
+        defaultIndex = 0;
+
+        switch (dir) //입구를 만들 벽의 방향
+        {
+            case 0: //상
+                min = offset.x;
+                max = min + width;
+                defaultIndex = offset.y + height - 1;
+                break;
+
+            case 1: //우
+                min = offset.y;
+                max = min + height;
+                defaultIndex = offset.x + width - 1;
+                break;
+
+            case 2: //하
+                min = offset.x;
+                max = min + width;
+                defaultIndex = offset.y;
+                break;
+
+            case 3: //좌
+                min = offset.y;
+                max = min + height;
+                defaultIndex = offset.x;
+                break;
+        }
+    }
+
+    private void CreateEntranceInRange(int dir, int min, int max, int defaultIndex)
+    {
+        int maxCreatedEntranceN = Random.Range(1, 4);
+        int createdEntranceN = 0;
+
+        while (createdEntranceN == 0)
+        {
+            if (dir == 0 || dir == 2)
+            {
+                int y = defaultIndex;
+                for (int x = min; x < max && createdEntranceN < maxCreatedEntranceN; x++)
+                {
+                    if (Random.Range(0, 2) == 1)
+                    {
+                        Vector2 dirVec = dir == 0 ? new Vector2(0, 1) : new Vector2(0, -1);
+
+                        Entrance newEntrance = new Entrance(dirVec, new Vector2(x, y));
+                        entrances.Add(newEntrance);
+
+                        x++;
+                        createdEntranceN++;
+                    }
+                }
+            }
+            else
+            {
+                int x = defaultIndex;
+                for (int y = min; y < max && createdEntranceN < maxCreatedEntranceN; y++)
+                {
+                    if (Random.Range(0, 2) == 1)
+                    {
+                        Vector2 dirVec = dir == 1 ? new Vector2(1, 0) : new Vector2(-1, 0);
+
+                        Entrance newEntrance = new Entrance(dirVec, new Vector2(x, y));
+                        entrances.Add(newEntrance);
+
+                        y++;
+                        createdEntranceN++;
+                    }
+                }
+            }
+        }
+    }
+
+    private void DebugEntrance()
+    {
+        foreach (var entrance in entrances)
+        {
+            Vector2 start = entrance.pos;
+            Vector2 end = start + entrance.dir;
+
+            Debug.DrawLine(start, end);
+        }
     }
 }

@@ -113,9 +113,40 @@ public class MapManager : MonoBehaviour
         map[clearPos.y, clearPos.x] = newTileCondition;
     }
 
-    public ETile GetTileCondition(Vector2 pos)
+    public bool IsInMapBounds(Vector2 pos)
+    {
+        if (pos.x < 0 || pos.y < 0 || pos.x >= mapWidth || pos.y >= mapHeight)
+            return false;
+        return true;
+    }
+
+    public ETile GetTileType(Vector2 pos)
     {
         return map[(int)pos.y, (int)pos.x];
+    }
+
+    public bool CanCrossWalk(Vector2 startPos, Vector2 dir)
+    {
+        if ((dir.x != 0 || dir.y != 0))
+        {
+            Vector2 tmpDir, aroundPos;
+
+            tmpDir = dir;
+            tmpDir.x = 0;
+
+            aroundPos = startPos + tmpDir;
+            if (GetTileType(aroundPos) == ETile.Wall)
+                return false;
+
+            tmpDir = dir;
+            tmpDir.y = 0;
+
+            aroundPos = startPos + tmpDir;
+            if (GetTileType(aroundPos) == ETile.Wall)
+                return false;
+        }
+
+        return true;
     }
 
     private void GenerateRooms()
@@ -140,6 +171,7 @@ public class MapManager : MonoBehaviour
             }
 
             newRoom.CreateRoom(map);
+            newRoom.EndReplaceRoom();
         }
     }
 
@@ -192,7 +224,6 @@ public class MapManager : MonoBehaviour
                 }
                 else if (map[y, x] == ETile.Player)
                 {
-                    Debug.Log(x + y + "player");
                 }
             }
         }

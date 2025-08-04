@@ -86,6 +86,7 @@
     <Compile Include="Assets\Scripts\Unit\AI\AIEnemyDetector.cs" />
     <Compile Include="Assets\Scripts\Unit\AI\AIFollowDetector.cs" />
     <Compile Include="Assets\Scripts\Unit\AI\AIMeleeAttackDetector.cs" />
+    <Compile Include="Assets\Scripts\Unit\AI\PathFindComponent.cs" />
     <Compile Include="Assets\Scripts\Unit\Enemy.cs" />
     <Compile Include="Assets\Scripts\Unit\MovingObject.cs" />
     <Compile Include="Assets\Scripts\Unit\Player.cs" />

@@ -104,7 +104,8 @@ public class GameManager : MonoBehaviour
             {
                 if (!enemy.CanAttack(PlayerTargetPos))   //추적
                 {
-                    //enemy.Trace(PlayerTargetPos);
+                    // 이거 순서 정하게 플레이어랑 거리 먼 순서대로 컨테이너에 넣어서 다른 반복문에서 하게 만들기
+                    enemy.Trace(PlayerTargetPos);
                 }
                 else
                 {

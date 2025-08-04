@@ -38,6 +38,7 @@ public abstract class MovingObject : MonoBehaviour
     protected virtual void Start()
     {
         MapManager.Instance.SetTile(transform.position, tileType);
+        onGetTileCondition += MapManager.Instance.GetTileType;
 
         gameManager = GameObject.Find("GameManager");
         animator = GetComponent<Animator>();
@@ -46,9 +47,6 @@ public abstract class MovingObject : MonoBehaviour
         //radio.clip = gameManager.GetComponent<GameManager>().clips[0];
 
         blockingLayer = LayerMask.GetMask("Wall");
-
-        MapManager mapManager = FindObjectOfType<MapManager>();
-        onGetTileCondition += mapManager.GetTileCondition;
     }
 
     protected virtual bool Move (int xDir, int yDir)
@@ -57,7 +55,7 @@ public abstract class MovingObject : MonoBehaviour
         Vector2 movePos = new Vector2(start.x + xDir, start.y + yDir);
 
         ETile tileCondition = onGetTileCondition.Invoke(movePos);
-        if (tileCondition == ETile.Wall)
+        if (tileCondition == ETile.Wall || !MapManager.Instance.CanCrossWalk(start, new Vector2(xDir, yDir)))
         {
             return false;
         }
