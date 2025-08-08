@@ -15,11 +15,11 @@ public class PathFindComponent : MonoBehaviour
         public Node(Vector2Int inPos) { this.pos = inPos; }
     }
 
-    public Stack<Vector2> paths { get; private set; }
+    public Stack<Vector2Int> paths { get; private set; }
 
     private void Start()
     {
-        paths = new Stack<Vector2>();
+        paths = new Stack<Vector2Int>();
     }
 
     private void Update()
@@ -27,8 +27,8 @@ public class PathFindComponent : MonoBehaviour
         var prePath = transform.position;
         foreach (var path in paths)
         {
-            Debug.DrawLine(prePath, path);
-            prePath = path;
+            Debug.DrawLine(prePath, (Vector2)path);
+            prePath = (Vector2)path;
         }
     }
 
@@ -88,9 +88,9 @@ public class PathFindComponent : MonoBehaviour
 
     private void Backtracking(Node node)
     {
-        paths = new Stack<Vector2>();
+        paths = new Stack<Vector2Int>();
 
-        while(node != null)
+        while(node?.parent != null)
         {
             paths.Push(node.pos);
             node = node.parent;
@@ -105,9 +105,9 @@ public class PathFindComponent : MonoBehaviour
         return 10 * Mathf.Max(x, y);
     }
 
-    private bool CanMovePos(Vector2 startPos, Vector2 dir)
+    private bool CanMovePos(Vector2Int startPos, Vector2Int dir)
     {
-        Vector2 targetPos = startPos + dir;
+        Vector2Int targetPos = startPos + dir;
 
         if (!MapManager.Instance.IsInMapBounds(targetPos) || !MapManager.Instance.CanCrossWalk(startPos, dir))
             return false;
@@ -119,25 +119,26 @@ public class PathFindComponent : MonoBehaviour
         return true;
     }
 
-    private bool IsPathStillValid()
+    public bool IsPathStillValid()
     {
-        Stack<Vector2> newPath = new Stack<Vector2>();
+        if (paths.Count == 0)
+            return false;
+
+        Stack<Vector2Int> newPath = new Stack<Vector2Int>();
 
         while(paths.Count > 0)
         {
-            Vector2 node = paths.Pop();
+            Vector2Int node = paths.Pop();
 
             ETile tile = MapManager.Instance.GetTileType(node);
             
             if(tile == ETile.Monster)
             {
-                //경로 재탐색
-
                 return false;
             }
             else //벽이 갑자기 생기는 경우는 없음
             {
-                newPath.Push(node);
+                //newPath.Push(node);
 
                 if(tile == ETile.Player)
                 {

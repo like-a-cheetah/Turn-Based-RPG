@@ -10,7 +10,6 @@ public class Player : MovingObject
     public GameObject sideArrow;
 
     private BoxCollider2D collider;
-    private Animator anim;
 
     public int horizontal;
     public int vertical;
@@ -39,7 +38,7 @@ public class Player : MovingObject
 
     public bool death;
 
-    public delegate void OnPlayerMoveStart(Vector2 PlayerNewPos);
+    public delegate void OnPlayerMoveStart(Vector2Int PlayerNewPos);
     public delegate void OnPlayerMoveEnd();
 
     public static OnPlayerMoveStart onMoveStart;
@@ -52,6 +51,8 @@ public class Player : MovingObject
     protected override void Awake()
     {
         tileType = ETile.Player;
+
+        enemyTile = ETile.Monster;
     }
 
     protected override void Start()
@@ -64,19 +65,17 @@ public class Player : MovingObject
 
         inven = new Dictionary<EItem, float>();
 
-        itemActions = new Dictionary<EItem, OnItemUse>
-        {
-            { EItem.heal, () => { Mathf.Clamp(HP + 7, 0, MaxHP); inven[EItem.heal]--; } },
-            { EItem.food, () => { Mathf.Clamp(food + 15, 0, MaxStamina); inven[EItem.food]--; } },
-            { EItem.sword, () => { useSword = !useSword; useBow = false; } },
-            { EItem.bow, () => { useBow = ! useBow; useSword = false; } },
-            { EItem.magic, () => MagicAttack() }
-        };
+        //itemActions = new Dictionary<EItem, OnItemUse>
+        //{
+        //    { EItem.heal, () => { Mathf.Clamp(HP + 7, 0, MaxHP); inven[EItem.heal]--; } },
+        //    { EItem.food, () => { Mathf.Clamp(food + 15, 0, MaxStamina); inven[EItem.food]--; } },
+        //    { EItem.sword, () => { useSword = !useSword; useBow = false; } },
+        //    { EItem.bow, () => { useBow = ! useBow; useSword = false; } },
+        //    { EItem.magic, () => MagicAttack() }
+        //};
 
         horizontal = 0;
         vertical = -1;
-
-        anim = GetComponent<Animator>();
 
         collider = GetComponent<BoxCollider2D>();
 
@@ -86,9 +85,7 @@ public class Player : MovingObject
     }
 
     void Update()
-    {
-        anim.SetBool("ismove", false);
-        
+    {        
         horizontal = (int)Input.GetAxisRaw("Horizontal");
         vertical = (int)Input.GetAxisRaw("Vertical");
 
@@ -103,26 +100,19 @@ public class Player : MovingObject
             RaycastHit2D hit = Physics2D.Raycast(transform.position, moveDir, 1.0f, blockingLayer);
             if(hit.rigidbody != null) return;
 
-            anim.SetFloat("inputX", horizontal);
-            anim.SetFloat("inputY", vertical);
-            
             if (food == 0)  //포만감이 0일 경우 체력이 줄어듦
                 HP--;
             else
                 food--; //모든 동작시 포만감이 줄어듦
 
-            //GameManager.instance.playersTurn = false;
-
             bool successMove = Move(horizontal, vertical);
 
-            Vector2 targetPos = transform.position;
+            Vector2Int targetPos = Vector2Int.RoundToInt(transform.position);
             targetPos.x += horizontal;
             targetPos.y += vertical;
 
             if (successMove)
             {
-                anim.SetFloat("inputX", horizontal);
-                anim.SetFloat("inputY", vertical);
                 onMoveStart.Invoke(targetPos);
             }
             else
@@ -143,206 +133,5 @@ public class Player : MovingObject
         {
             itemActions[useItem].Invoke();
         }
-    }
-
-    //public IEnumerator EnemyTurn()
-    //{
-    //    GameManager.instance.playersTurn = false;
-    //    //몬스터 동작 시작
-    //   // yield return StartCoroutine(GameManager.GetComponent<GameManager>().MoveEnemies());
-
-    //    GameManager.instance.playersTurn = true;
-    //}
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {   //각 아이템을 줍는다. 플레이어 오브젝트의 자식에 다른 오브젝트도 있기 때문에 두번 동작하여
-        //두번 동작한 값으로 개수가 올라감
-        //if (other.tag == "Exit1")
-        //{
-        //    radio.clip = clips[3];  //레벨 오르는 사운드 출력
-        //    radio.Play();
-
-        //    GameManager.changeGrid = true;
-        //    GameManager.NextFloor();
-        //    Debug.Log("다음 단계");
-        //}
-        //else if (other.tag == "Exit2")
-        //{
-        //    radio.clip = clips[3];  //레벨 오르는 사운드 출력
-        //    radio.Play();
-
-        //    GameManager.changeGrid = true;
-        //    GameManager.NextFloor2();
-        //    Debug.Log("다음 단계");
-        //}
-        //else if (other.tag == "Exit3")
-        //{
-        //    radio.clip = clips[3];  //레벨 오르는 사운드 출력
-        //    radio.Play();
-
-        //    GameManager.changeGrid = true;
-        //    GameManager.NextFloor3();
-        //    Debug.Log("다음 단계");
-        //}
-    }
-
-    protected override void OnCantMove<T> (T component)
-    {
-        Enemy hitEnemey = component as Enemy;
-        hitEnemey.LoseHP(power);
-        Debug.Log("공격");
-
-        anim.SetBool("ismove", false);
-
-        anim.SetFloat("inputX", Input.GetAxisRaw("Horizontal"));
-        anim.SetFloat("inputY", Input.GetAxisRaw("Vertical"));
-    }
-
-    private void Restart()  //출구 오브젝트와 충돌 할 때 호출(다음단계로 이동)
-    {
-        Debug.Log("Restart()");                         // loadedLevelName 사용해보기
-        //Application.LoadLevel(Application.loadedLevel); //마지막으로 로드된 신을 로드한다는 의미, 아직 씬은 한개임
-    }
-
-    private void CheckIfGameOver()
-    {
-        if (food <= 0)
-        {
-         
-        }
-    }
-
-    public void LoseHP(int damage, float damagedX, float damagedY)  //공격 받을때 loss값 만큼 감소
-    {
-        HP -= damage;
-
-        StartCoroutine(attacked(damagedX, damagedY));
-    }
-
-    IEnumerator attacked(float xDir, float yDir)
-    {
-        if (HP <= 0)
-        {
-            //yield return new WaitForSecondsRealtime(0.7f);
-            yield return null;
-        }
-
-        transform.Translate(new Vector2((float)xDir / 4, (float)yDir / 4));
-
-        yield return new WaitForSecondsRealtime(0.35f);
-
-        transform.Translate(new Vector2(-((float)xDir / 4), -((float)yDir / 4)));
-
-        yield return new WaitForSecondsRealtime(0.35f);
-    }
-
-    public IEnumerator ShootArrow(int dirY)
-    {
-        radio.clip = clips[1];
-        radio.Play();
-        var shootingArrow = Instantiate<GameObject>(this.arrow);
-
-        Vector3 direction = new Vector3(0, 0, 0); ;
-        
-        if (dirY == -1)  //위로 이동
-        {
-            shootingArrow.GetComponent<SpriteRenderer>().flipY = true;
-        }
-
-        arrowExist = true;
-
-      //  bowPoint -= 1;
-        
-        //GameManager.playersTurn = false;
-
-        yield return new WaitWhile(() => arrowExist == true);
-
-        //GameManager.playersTurn = true;
-
-       // yield return StartCoroutine(EnemyTurn());
-    }
-
-    public IEnumerator ShootSideArrow(int dirX)
-    {
-        radio.clip = clips[1];
-        radio.Play();
-        var shootingSideArrow = Instantiate<GameObject>(this.sideArrow);
-
-        Vector3 direction = new Vector3(0, 0, 0); ;
-        
-        if (dirX == 1)  //오른쪽으로 이동
-        {
-            shootingSideArrow.GetComponent<SpriteRenderer>().flipX = true;
-        }
-
-        arrowExist = true;
-
-       // bowPoint -= 1;
-
-        //GameManager.playersTurn = false;
-
-        yield return new WaitWhile(() => arrowExist == true);
-
-        //GameManager.playersTurn = true;
-
-    //    yield return StartCoroutine(EnemyTurn());
-    }
-
-    public IEnumerator ShootCross(int dirX, int dirY)
-    {
-        radio.clip = clips[1];
-        radio.Play();
-        var shootingSideArrow = Instantiate<GameObject>(this.sideArrow);
-
-        if (dirX == 1)  //우측
-        {
-            shootingSideArrow.GetComponent<SpriteRenderer>().flipX = true;
-
-            if (dirY == 1)  //우상향
-                shootingSideArrow.transform.localEulerAngles = new Vector3(0, 0, 45);
-
-            else    //우하향
-                shootingSideArrow.transform.localEulerAngles = new Vector3(0, 0, -45);
-
-            shootingSideArrow.GetComponent<Arrow>().rotation = 1;
-        }
-        else    //좌측
-        {
-            if (dirY == 1)  //좌상향
-                shootingSideArrow.transform.localEulerAngles = new Vector3(0, 0, -45);
-
-            else    //좌하향
-                shootingSideArrow.transform.localEulerAngles = new Vector3(0, 0, 45);
-
-            shootingSideArrow.GetComponent<Arrow>().rotation = 2;
-        }
-
-        arrowExist = true;
-
-        //inven[bowPoint -= 1;
-
-        //GameManager.playersTurn = false;
-
-        yield return new WaitWhile(() => arrowExist == true);
-
-     //   yield return StartCoroutine(EnemyTurn());
-    }
-
-    public IEnumerator MagicAttack()
-    {
-        //GameManager.playersTurn = false;
-
-        yield return new WaitWhile(() => endBomb == false);
-
-      //  yield return StartCoroutine(EnemyTurn());
-    }
-
-    public void revive()
-    {
-        HP = 10;
-        food = 20;
-        animator.SetBool("death", false);
-        death = false;
-        //GameManager.instance.playersTurn = true;
     }
 }

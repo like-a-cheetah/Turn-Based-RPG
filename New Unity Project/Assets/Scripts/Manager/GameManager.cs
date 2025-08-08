@@ -93,7 +93,7 @@ public class GameManager : MonoBehaviour
         enemies.Remove(deathEnemy);
     }
 
-    private void StartEnemiesMove(Vector2 PlayerTargetPos)
+    private void StartEnemiesMove(Vector2Int PlayerTargetPos)
     {
         List<Enemy> CanAttackEnemies = new List<Enemy>();
         Stack<Enemy> patrolFailedEnemies = new Stack<Enemy>();
@@ -104,7 +104,6 @@ public class GameManager : MonoBehaviour
             {
                 if (!enemy.CanAttack(PlayerTargetPos))   //추적
                 {
-                    // 이거 순서 정하게 플레이어랑 거리 먼 순서대로 컨테이너에 넣어서 다른 반복문에서 하게 만들기
                     enemy.Trace(PlayerTargetPos);
                 }
                 else
@@ -251,8 +250,6 @@ public class GameManager : MonoBehaviour
         radio.clip = clips[0];
         radio.Play();
         resultPanel.SetActive(false);
-
-        player.GetComponent<Player>().revive();
     }
 
     public void quitGame()

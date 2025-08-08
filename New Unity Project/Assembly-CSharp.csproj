@@ -67,6 +67,7 @@
     <Compile Include="Assets\Scripts\Loader.cs" />
     <Compile Include="Assets\Scripts\Manager\GameManager.cs" />
     <Compile Include="Assets\Scripts\Manager\MapManager.cs" />
+    <Compile Include="Assets\Scripts\Map\Entrance.cs" />
     <Compile Include="Assets\Scripts\Map\ETile.cs" />
     <Compile Include="Assets\Scripts\Map\Room.cs" />
     <Compile Include="Assets\Scripts\Object\Item\Arrow.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="Assets\Scripts\Unit\AI\AIFollowDetector.cs" />
     <Compile Include="Assets\Scripts\Unit\AI\AIMeleeAttackDetector.cs" />
     <Compile Include="Assets\Scripts\Unit\AI\PathFindComponent.cs" />
+    <Compile Include="Assets\Scripts\Unit\AnimationController.cs" />
     <Compile Include="Assets\Scripts\Unit\Enemy.cs" />
     <Compile Include="Assets\Scripts\Unit\MovingObject.cs" />
     <Compile Include="Assets\Scripts\Unit\Player.cs" />

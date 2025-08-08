@@ -10,6 +10,9 @@ public class MapManager : MonoBehaviour
 
     private ETile[,] map;
 
+    public GameObject wall;
+    public GameObject road;
+
     [SerializeField] public Room room;
     [SerializeField] public Player playerPrefab;
     private List<Room> rooms;
@@ -33,6 +36,9 @@ public class MapManager : MonoBehaviour
 
     [SerializeField] public Enemy[] enemiesPF;
 
+    private List<Entrance> allEntrances;
+    private List<(Entrance, Entrance)> entrancesPair;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -50,6 +56,8 @@ public class MapManager : MonoBehaviour
         gameMap = new GameObject("RoomContainer");
 
         roomN = Random.Range(roomMinN, roomMaxN[floor] + 1);
+
+        allEntrances = new List<Entrance>();
     }
 
     void Start()
@@ -57,6 +65,8 @@ public class MapManager : MonoBehaviour
         Enemy.onDeath += TileClear;
 
         GenerateRooms();
+
+        ConnectEntrances();
 
         CreatePlayer();
 
@@ -73,7 +83,7 @@ public class MapManager : MonoBehaviour
 
     void Update()
     {
-        //DebugMapSpace();
+        DebugMapSpace();
     }
 
     public void TileClear(Enemy enemy)
@@ -120,29 +130,24 @@ public class MapManager : MonoBehaviour
         return true;
     }
 
-    public ETile GetTileType(Vector2 pos)
+    public ETile GetTileType(Vector2Int pos)
     {
-        return map[(int)pos.y, (int)pos.x];
+        return map[pos.y, pos.x];
     }
 
-    public bool CanCrossWalk(Vector2 startPos, Vector2 dir)
+    public bool CanCrossWalk(Vector2Int startPos, Vector2Int dir)
     {
-        if ((dir.x != 0 || dir.y != 0))
+        if (dir.x == 0 || dir.y == 0)
+            return true;
+
+        for (int i = 0; i < 2; i++)
         {
-            Vector2 tmpDir, aroundPos;
+            Vector2Int tmp = dir;
+            tmp[i] = 0;
 
-            tmpDir = dir;
-            tmpDir.x = 0;
-
-            aroundPos = startPos + tmpDir;
-            if (GetTileType(aroundPos) == ETile.Wall)
-                return false;
-
-            tmpDir = dir;
-            tmpDir.y = 0;
-
-            aroundPos = startPos + tmpDir;
-            if (GetTileType(aroundPos) == ETile.Wall)
+            Vector2Int end = startPos + tmp;
+            ETile tile = MapManager.Instance.GetTileType(end);
+            if (tile == ETile.Wall)
                 return false;
         }
 
@@ -153,7 +158,7 @@ public class MapManager : MonoBehaviour
     {
         for (int i = 0; i < roomN; i++)
         {
-            Room newRoom = InstantiateRandomRoom();
+            Room newRoom = InstantiateRandomRoom(i);
             rooms.Add(newRoom);
 
             Vector2Int startVector = new Vector2Int(newRoom.width, newRoom.height);
@@ -175,7 +180,7 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    private Room InstantiateRandomRoom()
+    private Room InstantiateRandomRoom(int roomN)
     {
         int roomWidth = Random.Range(roomMinLine, roomMaxLine);
         int roomHeight = Random.Range(roomMinLine, roomMaxLine);
@@ -183,6 +188,7 @@ public class MapManager : MonoBehaviour
         Room newRoom = Instantiate<Room>(room, transform.position, Quaternion.identity, gameMap.transform);
         newRoom.width = roomWidth;
         newRoom.height = roomHeight;
+        newRoom.roomN = roomN;
 
         return newRoom;
     }
@@ -234,6 +240,7 @@ public class MapManager : MonoBehaviour
         int startRoomN = Random.Range(0, roomN);
 
         Vector2 startPos = rooms[startRoomN].GetRandomTilePos(map);
+        SetTile(startPos, ETile.Player);
 
         Instantiate<Player>(playerPrefab, startPos, Quaternion.identity, gameMap.transform);
     }
@@ -244,16 +251,129 @@ public class MapManager : MonoBehaviour
 
         for(int i=0; i<enemyN; i++)
         {
-            Vector2 randPos;
+            Vector2Int randPos;
+            ETile tile;
+
             do
             {
                 int randRoomN = Random.Range(0, roomN);
 
                 randPos = rooms[randRoomN].GetRandomTilePos(map);
-            }
-            while (randPos == new Vector2(-1, -1));
 
-            Instantiate<Enemy>(enemiesPF[0], randPos, Quaternion.identity, gameMap.transform);
+                tile = GetTileType(randPos);
+            }
+            while (randPos == new Vector2Int(-1, -1) || tile == ETile.Monster);
+
+            Instantiate<Enemy>(enemiesPF[0], (Vector2)randPos, Quaternion.identity, gameMap.transform);
+        }
+    }
+
+    private void ConnectEntrances()
+    {
+        entrancesPair = new List<(Entrance, Entrance)>();
+        MakeEntrancePair();
+
+        entrancesPair.Sort((pair1, pair2) =>
+        {
+            float dist1 = Vector2.Distance(pair1.Item1.pos, pair1.Item2.pos);
+            float dist2 = Vector2.Distance(pair2.Item1.pos, pair2.Item2.pos);
+            return dist1.CompareTo(dist2);
+        });
+
+        Union_Find(allEntrances, entrancesPair);
+    }
+
+    public void AddEntrance(Entrance newEntrance)
+    {
+        allEntrances.Add(newEntrance);
+    }
+
+    private void MakeEntrancePair()
+    {
+        for(int i=0; i<allEntrances.Count - 1; i++)
+        {
+            var a = allEntrances[i];
+
+            for (int j=i; j<allEntrances.Count; j++)
+            {
+                var b = allEntrances[j];
+
+                if (a.roomN != b.roomN)
+                {
+                    var pair = (a, b);
+                    entrancesPair.Add(pair);
+                }
+            }
+        }
+    }
+
+    private void Union_Find(List<Entrance> allEntrances, List<(Entrance, Entrance)> entrancesPair)
+    {
+        Dictionary<int, int> parent = new Dictionary<int, int>();
+
+        foreach (var Entrance in allEntrances)
+        {
+            parent[Entrance.roomN] = Entrance.roomN;
+        }
+
+        foreach(var (a, b) in entrancesPair)
+        {
+            int roomA = Find(a.roomN, parent);
+            int roomB = Find(b.roomN, parent);
+         
+            if(roomA != roomB)
+            {
+                CreateRoad(a, b);
+
+                parent[roomB] = parent[roomA];
+            }
+            else
+            {
+                // .N퍼 확률로 싸이클 만들기?
+            }
+        }
+    }
+
+    private int Find(int roomN, Dictionary<int, int> parent)
+    {
+        if (roomN != parent[roomN])
+        {
+            parent[roomN] = Find(parent[roomN], parent);
+        }
+
+        return parent[roomN];
+    }
+
+    private void CreateRoad(Entrance a, Entrance b)
+    {
+        Vector2Int start = a.pos;
+        Vector2Int end = b.pos;
+
+        int index = Random.Range(0, 2);
+
+        while (start != end)
+        {
+            index %= 2;
+
+            Vector2Int dir = Vector2Int.zero;
+
+            if (start[index] == end[index])
+            {
+                index++;
+
+                continue;
+            }
+            else
+            {
+                dir[index] = (start[index] - end[index]) > 0 ? -1 : 1;
+            }
+
+            start += dir;
+
+            if (map[start.y, start.x] != ETile.Empty)
+                Instantiate(road, new Vector3(start.x, start.y, 0), Quaternion.identity, gameMap.transform);
+
+            map[start.y, start.x] = ETile.Empty;
         }
     }
 }

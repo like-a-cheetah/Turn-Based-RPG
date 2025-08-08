@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Room : MonoBehaviour
 {
+    public int roomN;
+
     public GameObject wall;
     public GameObject road;
 
@@ -13,21 +15,7 @@ public class Room : MonoBehaviour
     public int width;
     public int height;
 
-    public List<Entrance> entrances;
-
     private bool isEndRoomReplace;
-
-    public class Entrance
-    {
-        public Vector2 dir;
-        public Vector2 pos;
-        
-        public Entrance(Vector2 inDir, Vector2 inPos)
-        {
-            dir = inDir;
-            pos = inPos;
-        }
-    }
     
     private void Awake()
     {
@@ -35,8 +23,6 @@ public class Room : MonoBehaviour
         rb.bodyType = RigidbodyType2D.Static;
 
         collider = GetComponent<BoxCollider2D>();
-
-        entrances = new List<Entrance>();
     }
 
     void Start()
@@ -63,8 +49,6 @@ public class Room : MonoBehaviour
 
         isEndRoomReplace = true;
     }
-
-    
 
     private void OverlapCheckColliderMake()
     {
@@ -127,9 +111,9 @@ public class Room : MonoBehaviour
         return collider.OverlapCollider(filter, results) > 0;
     }
 
-    public Vector2 GetRandomTilePos(ETile[,] map)
+    public Vector2Int GetRandomTilePos(ETile[,] map)
     {
-        Vector2 randomPos = new Vector2(-1, -1);
+        Vector2Int randomPos = new Vector2Int(-1, -1);
 
         Vector2Int start = Vector2Int.RoundToInt(transform.position);
 
@@ -170,18 +154,18 @@ public class Room : MonoBehaviour
                 int tryN = 0;
 
                 int x, y;
-                Vector2 obstaclePos;
+                Vector2Int obstaclePos;
                 do
                 {
                     x = Random.Range(start.x + 1, end.x - 1);
                     y = Random.Range(start.y + 1, end.y - 1);
 
-                    obstaclePos = new Vector2(x, y);
+                    obstaclePos = new Vector2Int(x, y);
 
                     tryN++;
                 } while (MapManager.Instance.GetTileType(obstaclePos) != ETile.Wall && tryN <= 10);
 
-                Instantiate(wall, obstaclePos, Quaternion.identity, transform);
+                Instantiate(wall, (Vector2)obstaclePos, Quaternion.identity, transform);
                 MapManager.Instance.SetTile(obstaclePos, ETile.Wall);
             }
         }
@@ -216,7 +200,7 @@ public class Room : MonoBehaviour
 
     private void SetEntranceRangeFromDirection(int dir, out int min, out int max, out int defaultIndex)
     {
-        Vector2Int offset = Vector2Int.FloorToInt(transform.position);
+        Vector2Int offset = Vector2Int.RoundToInt(transform.position);
 
         min = 0;
         max = 0;
@@ -266,8 +250,8 @@ public class Room : MonoBehaviour
                     {
                         Vector2 dirVec = dir == 0 ? new Vector2(0, 1) : new Vector2(0, -1);
 
-                        Entrance newEntrance = new Entrance(dirVec, new Vector2(x, y));
-                        entrances.Add(newEntrance);
+                        Entrance  newEntrance = new Entrance(new Vector2(x, y), roomN);
+                        MapManager.Instance.AddEntrance(newEntrance);
 
                         x++;
                         createdEntranceN++;
@@ -283,8 +267,8 @@ public class Room : MonoBehaviour
                     {
                         Vector2 dirVec = dir == 1 ? new Vector2(1, 0) : new Vector2(-1, 0);
 
-                        Entrance newEntrance = new Entrance(dirVec, new Vector2(x, y));
-                        entrances.Add(newEntrance);
+                        Entrance newEntrance = new Entrance(new Vector2(x, y), roomN);
+                        MapManager.Instance.AddEntrance(newEntrance);
 
                         y++;
                         createdEntranceN++;
@@ -296,12 +280,12 @@ public class Room : MonoBehaviour
 
     private void DebugEntrance()
     {
-        foreach (var entrance in entrances)
-        {
-            Vector2 start = entrance.pos;
-            Vector2 end = start + entrance.dir;
+        //foreach (var entrance in MapManager)
+        //{
+        //    Vector2 start = entrance.pos;
+        //    Vector2 end = start + entrance.dir;
 
-            Debug.DrawLine(start, end);
-        }
+        //    Debug.Draw(start, end);
+        //}
     }
 }

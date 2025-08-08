@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Enemy : MovingObject
 {
-    public Animator anim;
+    //public Animator anim;
     private PathFindComponent pathFinder;
     private Transform target;
     private bool skipMove;
@@ -20,17 +20,17 @@ public class Enemy : MovingObject
     public AIFollowDetector playerDetector;
     public AIEnemyDetector unitDetector;
 
-    public static readonly Vector2[] dirs = new Vector2[]
+    public static readonly Vector2Int[] dirs = new Vector2Int[]
     {
-        new Vector2(0, 1),   // 위
-        new Vector2(1, 0),   // 오른쪽
-        new Vector2(0, -1),  // 아래
-        new Vector2(-1, 0),   // 왼쪽
+        Vector2Int.up,   // 위
+        Vector2Int.right,   // 오른쪽
+        Vector2Int.down,  // 아래
+        Vector2Int.left,   // 왼쪽
 
-        new Vector2(1, 1),   // 우상
-        new Vector2(1, -1),  // 우하
-        new Vector2(-1, -1),  // 좌상
-        new Vector2(-1, 1)   // 좌하
+        new Vector2Int(1, 1),   // 우상
+        new Vector2Int(1, -1),  // 우하
+        new Vector2Int(-1, -1),  // 좌상
+        new Vector2Int(-1, 1)   // 좌하
     };
 
     private float preX;
@@ -69,6 +69,8 @@ public class Enemy : MovingObject
         GameManager.Instance.enemies.Add(this);
 
         pathFinder = GetComponent<PathFindComponent>();
+
+        enemyTile = ETile.Player;
     }
 
     protected override void Start()
@@ -84,7 +86,7 @@ public class Enemy : MovingObject
 
         enemiesPos.Add(this, transform.position);
 
-        blockingLayer = LayerMask.GetMask("Enemy");
+        //blockingLayer = LayerMask.GetMask("Enemy");
     }
 
     private void Update()
@@ -97,7 +99,7 @@ public class Enemy : MovingObject
             this.GetComponent<SpriteRenderer>().color = new Color(150 / 255f, 150 / 255f, 150 / 255f);
         else
             this.GetComponent<SpriteRenderer>().color = Color.white;
-        anim.SetBool("ismove", false);
+        //anim.SetBool("ismove", false);
 
         if (dampMove)
         {
@@ -129,13 +131,18 @@ public class Enemy : MovingObject
     public void Trace(Vector2 playerPos)
     {
         pathFinder.PathFind(Vector2Int.RoundToInt(transform.position), Vector2Int.RoundToInt(playerPos));
-    }
+        //if (!pathFinder.IsPathStillValid())
+        //{
+        //    pathFinder.PathFind(Vector2Int.RoundToInt(transform.position), Vector2Int.RoundToInt(playerPos));
+        //}
 
-    protected override void OnCantMove<T>(T component) //점거중인 공건에 적이 이동하려 할때 호출
-    {
-        Player hitPlayer = component as Player;
-
-        hitPlayer.LoseHP(power, attackX, attackY);
+        if (pathFinder.paths.Count > 0)
+        {
+            Vector2 targetPos = pathFinder.paths.Pop();
+            Vector2 currentPos = transform.position;
+            Vector2 dir = targetPos - currentPos;
+            Move(dir);
+        }
     }
 
     public void LoseHP(int damage)
@@ -150,35 +157,32 @@ public class Enemy : MovingObject
         }
     }
 
-    public bool CanAttack(Vector2 targetPos)
+    public bool CanAttack(Vector2Int targetPos)
     {
-        if(!(Vector2.Distance(targetPos, transform.position) <= SQRT2)) return false;
+        Vector2Int start = Vector2Int.RoundToInt(transform.position);
+        Vector2Int normal = targetPos - start;
 
-        Vector2 start = transform.position;
-        foreach (Vector2 dir in dirs)
-        {
-            RaycastHit2D hit = Physics2D.Raycast(start, dir, 1f, blockingLayer);
-            if (canAttack = hit.collider.tag == "Player")
-                return true;
-        }
-
-        return false;
+        if (!MapManager.Instance.CanCrossWalk(start, normal) 
+            || Mathf.Abs(normal.x) > 1 || Mathf.Abs(normal.y) > 1)
+            return false;
+        
+        return true;
     }
 
     private Vector2Int RandomDirection()
     {
         Vector2Int resultDir = Vector2Int.zero;
 
-        Vector2 start = transform.position;
+        Vector2Int start = Vector2Int.RoundToInt(transform.position);
 
-        List<Vector2> tmpDirs = new List<Vector2>(dirs);
+        List<Vector2Int> tmpDirs = new List<Vector2Int>(dirs);
 
         while (tmpDirs.Count > 0)
         {
             int randN = Random.Range(0, tmpDirs.Count);
-            Vector2 testDir = tmpDirs[randN];
+            Vector2Int testDir = tmpDirs[randN];
 
-            Vector2 targetPos = start + testDir;
+            Vector2Int targetPos = start + testDir;
 
             ETile targetTile = MapManager.Instance.GetTileType(targetPos);
             //Debug.Log("TEST " + targetPos + " = " + targetTile);
@@ -188,7 +192,7 @@ public class Enemy : MovingObject
             }
             else
             {
-                resultDir = Vector2Int.FloorToInt(tmpDirs[randN]);
+                resultDir = Vector2Int.RoundToInt(tmpDirs[randN]);
                 break;
             }
         }
@@ -217,7 +221,7 @@ public class Enemy : MovingObject
         radio.Play();
         this.GetComponent<SpriteRenderer>().color = Color.white;
         Vector3 where = transform.position;
-        anim.SetTrigger("death");
+        //anim.SetTrigger("death");
 
         Debug.Log("사망");
 
