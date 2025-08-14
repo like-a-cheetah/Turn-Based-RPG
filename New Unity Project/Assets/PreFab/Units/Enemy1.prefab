@@ -201,7 +201,7 @@ MonoBehaviour:
   radius: 5
   detectColor: {r: 1, g: 0, b: 0, a: 0.25882354}
   gizmoColor: {r: 0.0061821938, g: 0, b: 1, a: 0.14117648}
-  showGizmos: 1
+  showGizmos: 0
 --- !u!114 &3924642493867435294
 MonoBehaviour:
   m_ObjectHideFlags: 0

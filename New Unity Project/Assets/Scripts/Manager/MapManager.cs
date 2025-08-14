@@ -77,12 +77,11 @@ public class MapManager : MonoBehaviour
             TileClear(start);
             SetTile(end, unit.tileType);
         };
-        //Player.onMoveStart += (Vector2 TargetPos) => { SetTile(TargetPos, ETile.Player); };
     }
 
     void Update()
     {
-        //DebugMapSpace();
+        DebugMapSpace();
     }
 
     public void TileClear(Enemy enemy)
@@ -263,8 +262,10 @@ public class MapManager : MonoBehaviour
             }
             while (randPos == new Vector2Int(-1, -1) || tile == ETile.Monster);
 
-            Instantiate<Enemy>(enemiesPF[0], (Vector2)randPos, Quaternion.identity, gameMap.transform);
+            Enemy newEnemy = Instantiate<Enemy>(enemiesPF[0], (Vector2)randPos, Quaternion.identity, gameMap.transform);
             SetTile(randPos, ETile.Monster);
+
+            newEnemy.name = newEnemy.name + i;
         }
     }
 

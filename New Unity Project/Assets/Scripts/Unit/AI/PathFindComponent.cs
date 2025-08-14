@@ -34,8 +34,10 @@ public class PathFindComponent : MonoBehaviour
 
     public void PathFind(Vector2Int startPos, Vector2Int goal)
     {
+        paths = new Stack<Vector2Int>();
+
         List<Node> open = new List<Node>();
-        HashSet<Vector2> close = new HashSet<Vector2>();
+        HashSet<Vector2Int> close = new HashSet<Vector2Int>();
 
         Node startNode = new Node(startPos) { gCost = 0, hCost = Heuristic(startPos, goal) };
         open.Add(startNode);

@@ -68,6 +68,8 @@ public class Enemy : MovingObject
 
     public static OnDeathDelegate onDeath;
 
+    private Item item;
+
     protected override void Awake()
     {
         base.Awake();
@@ -82,6 +84,8 @@ public class Enemy : MovingObject
         detector = GetComponent<AIEnemyDetector>();
         detector.targetLayer = LayerMask.GetMask("Player");
         detector.OnPlayerDetected += (Player inObj) => { player = inObj; };
+
+        enemyLayer = 1 << LayerMask.NameToLayer("Player");
     }
 
     protected override void Start()
@@ -91,6 +95,8 @@ public class Enemy : MovingObject
         stat.Init(1, 1);
 
         enemiesPos.Add(this, transform.position);
+
+        item = Item.CreateRandomItem();
     }
 
     private void Update()
@@ -107,6 +113,18 @@ public class Enemy : MovingObject
         {
             enemy.CheckCondition();
         }
+    }
+
+    public bool CanAttack()
+    {
+        Vector2Int start = mapPos;
+        Vector2Int normal = player.mapPos - start;
+
+        if (!MapManager.Instance.CanCrossWalk(start, normal)
+            || Mathf.Abs(normal.x) > 1 || Mathf.Abs(normal.y) > 1)
+            return false;
+
+        return true;
     }
 
     private void CheckCondition()
@@ -185,7 +203,7 @@ public class Enemy : MovingObject
         Debug.Log(-damage);
     }
 
-    protected override IEnumerator Attack(Vector2 dir)
+    protected override IEnumerator Attack(Vector2Int dir)
     {
         animController.SetLookDirection(dir);
 
@@ -194,21 +212,9 @@ public class Enemy : MovingObject
 
     public IEnumerator AttackPlayer()
     {
-        Vector2 dir = player.transform.position - transform.position;
+        Vector2Int dir = player.mapPos - mapPos;
 
         yield return StartCoroutine(Attack(dir));
-    }
-
-    public bool CanAttack()
-    {
-        Vector2Int start = mapPos;
-        Vector2Int normal = player.mapPos - start;
-
-        if (!MapManager.Instance.CanCrossWalk(start, normal) 
-            || Mathf.Abs(normal.x) > 1 || Mathf.Abs(normal.y) > 1)
-            return false;
-        
-        return true;
     }
 
     private Vector2Int RandomDirection()
@@ -239,6 +245,14 @@ public class Enemy : MovingObject
         }
 
         return resultDir;
+    }
+
+    protected override void Death()
+    {
+        base.Death();
+
+        Vector2 dropPos = mapPos;
+        if(item) Instantiate(item, dropPos, Quaternion.identity);
     }
 
     private void OnDestroy()

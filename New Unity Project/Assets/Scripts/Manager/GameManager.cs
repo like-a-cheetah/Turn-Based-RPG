@@ -56,6 +56,8 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
 
         Enemy.onDeath += EnemyDelete;
+
+        Item.Init();
     }
 
     private void Start()
@@ -88,7 +90,7 @@ public class GameManager : MonoBehaviour
             yield return StartCoroutine(EnemiesAttackStart());
         }
 
-        player.turn = true;
+        player.OnPlayerTurnStart();
     }
 
     public IEnumerator PlayerAttackEnd()
@@ -99,7 +101,8 @@ public class GameManager : MonoBehaviour
 
         yield return StartCoroutine(NotAttackEnemiesMove());
 
-        player.turn = true;
+        player.OnPlayerTurnStart();
+
     }
 
     public IEnumerator NotAttackEnemiesMove()

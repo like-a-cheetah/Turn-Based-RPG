@@ -4,24 +4,59 @@ using UnityEngine;
 
 public class Item : MonoBehaviour
 {
-    public GameObject parent;
+    [SerializeField]
+    public float chargeVal;
+    
+    [SerializeField]
+    public static List<Item> items = new List<Item>();
+
+    public static int weightsSum;
 
     [SerializeField]
-    private EItem itemType;
-    [SerializeField]
-    private float chargeVal;
+    public int weight;
+
+    public static LayerMask layer;
+
+    public static void Init()
+    {
+        Item[] prefabs = Resources.LoadAll<Item>("DroppedItems");
+
+        foreach (Item prefab in prefabs)
+        {
+            items.Add(prefab);
+            weightsSum += prefab.weight;
+        }
+    }
+
+    private void Awake()
+    {
+         layer = LayerMask.GetMask("Item");
+    }
 
     void Start()
     {
-        this.transform.position = parent.transform.position;
     }
-    
-    private void OnTriggerEnter2D(Collider2D other)
+
+    public static Item CreateRandomItem()
     {
-        Player player = other.GetComponent<Player>();
-        if (player != null)
+        int rand = UnityEngine.Random.Range(0, Item.weightsSum);
+
+        int count = 0;
+
+        for (int i = 0; i < items.Count; i++)
         {
-            player.ItemCharging(itemType, chargeVal);
+            count += items[i].weight;
+            if (rand < count)
+            {
+                return items[i];
+            }
         }
+
+        return null;
+    }
+
+    public virtual void Use()
+    {
+        
     }
 }

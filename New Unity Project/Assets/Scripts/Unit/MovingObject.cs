@@ -6,10 +6,11 @@ public abstract class MovingObject : MonoBehaviour
 {
     private float moveTime = .4f;
     public LayerMask blockingLayer;
+    protected LayerMask enemyLayer;
 
     private Animator anim;
 
-    private BoxCollider2D boxCollider;
+    protected BoxCollider2D boxCol;
     private Rigidbody2D rb2D;
     private float inverseMoveTime;
 
@@ -21,8 +22,6 @@ public abstract class MovingObject : MonoBehaviour
     public AudioSource radio;
 
     protected Vector2 moveEndPos;
-
-    public bool turn = true;
 
     protected delegate ETile GetTileCondition(Vector2Int pos);
     protected GetTileCondition onGetTileCondition;
@@ -58,9 +57,10 @@ public abstract class MovingObject : MonoBehaviour
     protected virtual void Awake()
     {
         mapPos = Vector2Int.RoundToInt(transform.position);
-
+        
         anim = GetComponent<Animator>();
         rb2D = GetComponent<Rigidbody2D>();
+        boxCol = GetComponent<BoxCollider2D>();
 
         animator = GetComponent<Animator>();
         animController = GetComponent<AnimationController>();
@@ -68,6 +68,7 @@ public abstract class MovingObject : MonoBehaviour
         stat = GetComponent<Stat>();
         stat.Init(1, 1);
         stat.onHpZero += animController.PlayDeath;
+
     }
 
     protected virtual void Start()
@@ -124,21 +125,39 @@ public abstract class MovingObject : MonoBehaviour
         transform.position = end;
     }
 
-    protected virtual IEnumerator Attack(Vector2 dir)
+    protected virtual IEnumerator Attack(Vector2Int dir)
     {
         attackDelay = true;
 
-        animController.PlayAttack();
-
         Vector2 start = transform.position;
-        Vector2 end = start + dir * 0.7f;
-
-        attacking = true;
+        Vector2 end = start + (Vector2)dir * 0.7f;
+        
         yield return StartCoroutine(SmoothMovement(end, .2f));
-        attacking = false;
+
+        CheckAttack(start + dir, dir);
+
         yield return StartCoroutine(SmoothMovement(start, .2f));
 
         if (!successAttack) attackDelay = false;
+    }
+
+    protected virtual void CheckAttack(Vector2 pos, Vector2Int dir)
+    {
+        Vector2 size = new Vector2(.3f, .3f);
+        Collider2D collider = Physics2D.OverlapBox(pos, size, 0, enemyLayer);
+        if(collider)
+        {
+            MovingObject otherUnit = collider.GetComponent<MovingObject>();
+            if (otherUnit && !otherUnit.CompareTag(tag))
+            {
+                successAttack = true;
+
+                StartCoroutine(otherUnit.Attacked(this));
+                otherUnit.stat.TakeDamage(stat.ad);
+
+                return;
+            }
+        }
     }
 
     protected IEnumerator Attacked(MovingObject attacker)
@@ -178,21 +197,24 @@ public abstract class MovingObject : MonoBehaviour
     //    }
     //}
 
-    private void OnTriggerStay2D(Collider2D other)
+    //protected abstract void OnTriggerEnter2D(Collider2D collision);
+
+    protected virtual void OnTriggerStay2D(Collider2D other)
     {
-        if (!attacking) return;
+        //Debug.Log(other.name);
+        //if (!attacking) return;
 
-        MovingObject otherUnit = other.GetComponent<MovingObject>();
-        if (otherUnit && !otherUnit.CompareTag(tag))
-        {
-            successAttack = true;
-            attacking = false;
+        //MovingObject otherUnit = other.GetComponent<MovingObject>();
+        //if (otherUnit && !otherUnit.CompareTag(tag))
+        //{
+        //    successAttack = true;
+        //    attacking = false;
 
-            StartCoroutine(otherUnit.Attacked(this));
-            otherUnit.stat.TakeDamage(stat.ad);
+        //    StartCoroutine(otherUnit.Attacked(this));
+        //    otherUnit.stat.TakeDamage(stat.ad);
 
-            return;
-        }
+        //    return;
+        //}
     }
 
     public void AttackFinish()
