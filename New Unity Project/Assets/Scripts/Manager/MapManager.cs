@@ -72,26 +72,25 @@ public class MapManager : MonoBehaviour
 
         GeneratesEnemies();
         
-        MovingObject.onMoveUnit += (MovingObject obj, Vector2 moveDir) =>
+        MovingObject.onMoveUnit += (MovingObject unit, Vector2Int start, Vector2Int end) =>
         {
-            Vector2 startPos = obj.transform.position;
-            TileClear(startPos);
-            SetTile(startPos + moveDir, obj.tileType);
+            TileClear(start);
+            SetTile(end, unit.tileType);
         };
         //Player.onMoveStart += (Vector2 TargetPos) => { SetTile(TargetPos, ETile.Player); };
     }
 
     void Update()
     {
-        DebugMapSpace();
+        //DebugMapSpace();
     }
 
     public void TileClear(Enemy enemy)
     {
-        TileClear(enemy.transform.position);
+        TileClear(Vector2Int.RoundToInt(enemy.mapPos));
     }
 
-    public void TileClear(Vector2 pos)
+    public void TileClear(Vector2Int pos)
     {
         Vector2Int clearPos = Vector2Int.RoundToInt(pos);
 
@@ -107,7 +106,7 @@ public class MapManager : MonoBehaviour
         map[clearPos.y, clearPos.x] = ETile.Empty;
     }
 
-    public void SetTile(Vector2 pos, ETile newTileCondition)
+    public void SetTile(Vector2Int pos, ETile newTileCondition)
     {
         Vector2Int clearPos = Vector2Int.RoundToInt(pos);
 
@@ -220,7 +219,7 @@ public class MapManager : MonoBehaviour
         {
             for (int x = 0; x < cols; x++)
             {
-                if (map[y, x] == ETile.Wall)
+                if (map[y, x] != ETile.Empty)
                 {
                     Vector3 center = new Vector3(x, y, 0);
                     float size = 0.25f;
@@ -239,10 +238,10 @@ public class MapManager : MonoBehaviour
     {
         int startRoomN = Random.Range(0, roomN);
 
-        Vector2 startPos = rooms[startRoomN].GetRandomTilePos(map);
+        Vector2Int startPos = rooms[startRoomN].GetRandomTilePos(map);
         SetTile(startPos, ETile.Player);
 
-        Instantiate<Player>(playerPrefab, startPos, Quaternion.identity, gameMap.transform);
+        Instantiate<Player>(playerPrefab, new Vector2(startPos.x, startPos.y), Quaternion.identity, gameMap.transform);
     }
 
     private void GeneratesEnemies()
@@ -265,6 +264,7 @@ public class MapManager : MonoBehaviour
             while (randPos == new Vector2Int(-1, -1) || tile == ETile.Monster);
 
             Instantiate<Enemy>(enemiesPF[0], (Vector2)randPos, Quaternion.identity, gameMap.transform);
+            SetTile(randPos, ETile.Monster);
         }
     }
 

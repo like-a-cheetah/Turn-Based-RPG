@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6587673404531825271}
   - component: {fileID: 3841445423053906451}
-  - component: {fileID: 6663228752318242638}
   m_Layer: 0
   m_Name: MapManager
   m_TagString: Untagged
@@ -47,28 +46,7 @@ MonoBehaviour:
   wall: {fileID: 4596958583063003426, guid: 45464abdd57c14049a996b6f356cf46f, type: 3}
   road: {fileID: 4596958583063003426, guid: faa5e3e193248714892034db8d419741, type: 3}
   room: {fileID: 6283915227216834559, guid: 2cbf5f763a7e7b149a7b8469b1414fd2, type: 3}
-  playerPrefab: {fileID: 3603622911490796112, guid: d01237c8c13ee2e449458bb0466b9a55,
+  playerPrefab: {fileID: 3603622911490796112, guid: 39335a20d5de2bc4d9368baef82993a7,
     type: 3}
   enemiesPF:
   - {fileID: -9122568063740288560, guid: 00d48a4541751ce43b1daf5711a560c8, type: 3}
---- !u!50 &6663228752318242638
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3480725288128439420}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0

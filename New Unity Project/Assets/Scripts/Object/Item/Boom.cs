@@ -24,7 +24,6 @@ public class Boom : MonoBehaviour
         if (other.gameObject.CompareTag("Enemy") 
             && !other.GetComponent<Enemy>().knockbacked)
         {
-            other.GetComponent<Enemy>().BoomDamage();
         }
     }
 

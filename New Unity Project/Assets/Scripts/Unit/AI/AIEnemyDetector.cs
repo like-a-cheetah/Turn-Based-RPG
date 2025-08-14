@@ -7,27 +7,32 @@ public class AIEnemyDetector : MonoBehaviour
 {
     public LayerMask targetLayer;
 
-    public UnityEvent<GameObject> OnPlayerDetected;
+    public UnityAction<Player> OnPlayerDetected;
 
     [Range(0, 5)]
     public float radius;
 
+    [Header("Gizmo parameters")]
+    public Color detectColor = Color.red;
     [Header("Gizmo parameters")]
     public Color gizmoColor = Color.green;
     public bool showGizmos = true;
 
     public bool PlayerDetected { get; internal set; }
 
-    // Update is called once per frame
     private void Update()
     {
-        var collider = Physics2D.OverlapCircle(transform.position, radius, targetLayer);
-        
-        PlayerDetected = collider != null;
-        if (PlayerDetected)
+        if (!PlayerDetected)
         {
-            Gizmos.color = Color.red;
-            OnPlayerDetected?.Invoke(collider.gameObject);
+            var collider = Physics2D.OverlapCircle(transform.position, radius, targetLayer);
+
+            PlayerDetected = collider != null;
+            if (PlayerDetected)
+            {
+                gizmoColor = detectColor;
+                Player player = collider.gameObject.GetComponent<Player>();
+                if(player) OnPlayerDetected?.Invoke(player);
+            }
         }
     }
 

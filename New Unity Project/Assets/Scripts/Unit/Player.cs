@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
+using UnityEngine;
 
 public class Player : MovingObject
 {
     public GameManager GameManager;
     public GameObject arrow;
     public GameObject sideArrow;
-
-    private BoxCollider2D collider;
 
     public int horizontal;
     public int vertical;
@@ -48,8 +48,15 @@ public class Player : MovingObject
 
     private Dictionary<EItem, OnItemUse> itemActions;
 
+    private Vector2Int lookDir;
+
+    [SerializeField]
+    public GameObject deathEffect;
+    
     protected override void Awake()
     {
+        base.Awake();
+
         tileType = ETile.Player;
 
         enemyTile = ETile.Monster;
@@ -57,11 +64,13 @@ public class Player : MovingObject
 
     protected override void Start()
     {
-        tileType = ETile.Player;
+        base.Start();
 
-        HP = 10;
-        food = 20;
-        power = 1;
+        stat.Init(10000, 1);
+
+        lookDir = new Vector2Int(0, -1);
+
+        tileType = ETile.Player;
 
         inven = new Dictionary<EItem, float>();
 
@@ -77,49 +86,17 @@ public class Player : MovingObject
         horizontal = 0;
         vertical = -1;
 
-        collider = GetComponent<BoxCollider2D>();
-
         blockingLayer = LayerMask.GetMask("Player");
 
+        sprite = GetComponent<SpriteRenderer>();
         base.Start();
     }
 
     void Update()
-    {        
-        horizontal = (int)Input.GetAxisRaw("Horizontal");
-        vertical = (int)Input.GetAxisRaw("Vertical");
+    {
+        Control();
 
-        //대각선 방향으로 이동이 가능하게 할 수 있도록 프로젝트 세팅에서 텐키에서 home, pu, pd, end, insert로
-        //horizontal, vertical의 값을 변경 가능하게 만듦,
-        if (!(horizontal == 0 && vertical == 0) && moveEnd)
-        {
-            moveEnd = false;
-
-            Vector2 moveDir = new Vector2(horizontal, vertical);
-            
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, moveDir, 1.0f, blockingLayer);
-            if(hit.rigidbody != null) return;
-
-            if (food == 0)  //포만감이 0일 경우 체력이 줄어듦
-                HP--;
-            else
-                food--; //모든 동작시 포만감이 줄어듦
-
-            bool successMove = Move(horizontal, vertical);
-
-            Vector2Int targetPos = Vector2Int.RoundToInt(transform.position);
-            targetPos.x += horizontal;
-            targetPos.y += vertical;
-
-            if (successMove)
-            {
-                onMoveStart.Invoke(targetPos);
-            }
-            else
-            {
-                moveEnd = true;
-            }
-        }
+        animController.SetLookDirection(lookDir.x, lookDir.y);
     }
 
     public void ItemCharging(EItem newItem, float chargeVal)
@@ -133,5 +110,86 @@ public class Player : MovingObject
         {
             itemActions[useItem].Invoke();
         }
+    }
+
+    public void Control()
+    {
+        if (!turn) return;
+
+        horizontal = (int)Input.GetAxisRaw("Horizontal");
+        vertical = (int)Input.GetAxisRaw("Vertical");
+
+        Vector2Int inputVec = new Vector2Int(horizontal, vertical);
+        
+        if (!(horizontal == 0 && vertical == 0))
+        {
+            lookDir = inputVec;
+            if (Input.GetKey(KeyCode.LeftControl))    // 시선 변경
+                return;
+
+            turn = false;
+
+            bool successMove = Move(inputVec);
+            
+            if (!successMove)
+                turn = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.Space))
+        {
+            turn = false;
+
+            StartCoroutine(Attack(lookDir));
+
+            Instantiate(deathEffect, transform.position, Quaternion.identity);
+        }
+    }
+
+    protected bool Move(Vector2Int dir)
+    {
+        animController.PlayAnimDirection(dir);
+        
+        Vector2Int start, movePos;
+
+        start = mapPos;
+        movePos = start + dir;
+
+        ETile tileCondition = onGetTileCondition.Invoke(movePos);
+        if (tileCondition == ETile.Wall || !MapManager.Instance.CanCrossWalk(start, dir))
+        {
+            return false;
+        }
+        else if (tileCondition == ETile.Empty)
+        {
+            mapPos = movePos;
+
+            animController.PlayWalk();
+
+            onMoveUnit(this, start, movePos);
+            StartCoroutine(SmoothMovement(movePos));
+
+            StartCoroutine(GameManager.instance.PlayerMoveEnd());
+        }
+        else if (tileCondition == enemyTile)
+        {
+            StartCoroutine(Attack(dir));
+        }
+
+        return true;
+    }
+
+    protected override IEnumerator Attack(Vector2 dir)
+    {
+        yield return base.Attack(dir);
+
+        yield return attackWait;
+
+        yield return new WaitUntil(() => !attackDelay);
+
+        yield return StartCoroutine(GameManager.instance.PlayerAttackEnd());
+    }
+
+    protected override void Death()
+    {
+
     }
 }
