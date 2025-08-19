@@ -45,6 +45,7 @@ public class Room : MonoBehaviour
     public void EndReplaceRoom()
     {
         GenerateRandObstacle();
+        GenerateItems();
         SetEntrance();
 
         isEndRoomReplace = true;
@@ -169,6 +170,11 @@ public class Room : MonoBehaviour
                 MapManager.Instance.SetTile(obstaclePos, ETile.Wall);
             }
         }
+    }
+
+    private void GenerateItems()
+    {
+        int insideArea = (width * height) - (width * 2 + (height - 2) * 2);
     }
 
     private void SetEntrance()
