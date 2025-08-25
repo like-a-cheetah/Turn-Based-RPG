@@ -12,6 +12,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: Heart
       objectReference: {fileID: 0}
+    - target: {fileID: 446001739561315129, guid: d52ff43d96cb62b47bc663150e264bb7,
+        type: 3}
+      propertyPath: weight
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 446001739561315129, guid: d52ff43d96cb62b47bc663150e264bb7,
+        type: 3}
+      propertyPath: chargeVal
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 446001739561315129, guid: d52ff43d96cb62b47bc663150e264bb7,
+        type: 3}
+      propertyPath: n
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 446001739561315130, guid: d52ff43d96cb62b47bc663150e264bb7,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -67,14 +82,15 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 446001739561315129, guid: d52ff43d96cb62b47bc663150e264bb7,
+    - target: {fileID: 446001739561315131, guid: d52ff43d96cb62b47bc663150e264bb7,
         type: 3}
-      propertyPath: weight
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 446001739561315129, guid: d52ff43d96cb62b47bc663150e264bb7,
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 8f03d65eca65243d0963f648c2e9824a,
         type: 3}
-      propertyPath: chargeVal
+    - target: {fileID: 446001739561315131, guid: d52ff43d96cb62b47bc663150e264bb7,
+        type: 3}
+      propertyPath: m_WasSpriteAssigned
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 446001739561315128, guid: d52ff43d96cb62b47bc663150e264bb7,
@@ -115,17 +131,6 @@ PrefabInstance:
     - target: {fileID: 446001739561315128, guid: d52ff43d96cb62b47bc663150e264bb7,
         type: 3}
       propertyPath: m_SpriteTilingProperty.drawMode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 446001739561315131, guid: d52ff43d96cb62b47bc663150e264bb7,
-        type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: 8f03d65eca65243d0963f648c2e9824a,
-        type: 3}
-    - target: {fileID: 446001739561315131, guid: d52ff43d96cb62b47bc663150e264bb7,
-        type: 3}
-      propertyPath: m_WasSpriteAssigned
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []

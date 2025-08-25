@@ -103,7 +103,8 @@ GameObject:
   - component: {fileID: 1517694271397412066}
   - component: {fileID: 4457695873381099491}
   - component: {fileID: 6185529476590306717}
-  - component: {fileID: 7870901474781560365}
+  - component: {fileID: 5831632272449131871}
+  - component: {fileID: 8716158042921569324}
   m_Layer: 9
   m_Name: Player
   m_TagString: Player
@@ -145,7 +146,6 @@ MonoBehaviour:
   animator: {fileID: 0}
   animController: {fileID: 0}
   radio: {fileID: 0}
-  turn: 1
   GameManager: {fileID: 0}
   arrow: {fileID: 1573162605663972487, guid: 7ee4aaa9ffe866f48865de966f544aa0, type: 3}
   sideArrow: {fileID: 5800812109378429116, guid: 19743a01191af67418322d0df2c68f92,
@@ -298,7 +298,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &7870901474781560365
+--- !u!114 &5831632272449131871
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -307,6 +307,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 5935170002294805045}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97cbe34fc20baf04a84a3e4073b38f1a, type: 3}
+  m_Script: {fileID: 11500000, guid: 20b754bb6fa99db49b37b2f0ab6fbf1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UI: {fileID: 8469912676380022843, guid: 0c637b2433160a24884a564b7a7a7392, type: 3}
+--- !u!114 &8716158042921569324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5935170002294805045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f909cf27c65f3a642be723b632c9d6b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

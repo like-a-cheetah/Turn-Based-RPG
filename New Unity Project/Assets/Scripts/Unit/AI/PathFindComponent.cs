@@ -58,7 +58,7 @@ public class PathFindComponent : MonoBehaviour
 
             foreach (var dir in Enemy.dirs)
             {
-                Vector2Int end = node.pos + Vector2Int.RoundToInt(dir);
+                Vector2Int end = node.pos + dir;
                 if (!CanMovePos(node.pos, dir) || close.Contains(end))
                     continue;
 

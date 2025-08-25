@@ -18,9 +18,9 @@ public class Stat : MonoBehaviour
         ad = inAd;
     }
 
-    private void Start()
+    protected virtual void Start()
     {
-        hp = maxHp;
+        SetHp(maxHp);
     }
 
     protected void SetHp(int newHp)

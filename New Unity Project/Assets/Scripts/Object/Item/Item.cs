@@ -4,11 +4,16 @@ using UnityEngine;
 
 public class Item : MonoBehaviour
 {
+    public enum EItem
+    {
+        Heal, Food, Sword, Arrow, Magic
+    }
+
     [SerializeField]
-    public float chargeVal;
-    
+    public EItem itemType;
+
     [SerializeField]
-    public static List<Item> items = new List<Item>();
+    public static List<Item> allItems = new List<Item>();
 
     public static int weightsSum;
 
@@ -17,20 +22,24 @@ public class Item : MonoBehaviour
 
     public static LayerMask layer;
 
+    //public float n { protected set; get; }
+    [SerializeField]
+    public float n;
+
     public static void Init()
     {
         Item[] prefabs = Resources.LoadAll<Item>("DroppedItems");
 
         foreach (Item prefab in prefabs)
         {
-            items.Add(prefab);
+            allItems.Add(prefab);
             weightsSum += prefab.weight;
         }
     }
 
     private void Awake()
     {
-         layer = LayerMask.GetMask("Item");
+        layer = LayerMask.GetMask("Item");
     }
 
     void Start()
@@ -43,20 +52,22 @@ public class Item : MonoBehaviour
 
         int count = 0;
 
-        for (int i = 0; i < items.Count; i++)
+        for (int i = 0; i < allItems.Count; i++)
         {
-            count += items[i].weight;
+            count += allItems[i].weight;
             if (rand < count)
             {
-                return items[i];
+                return allItems[i];
             }
         }
 
         return null;
     }
 
-    public virtual void Use()
+    public virtual float UseItem()
     {
-        
+        print(name);
+
+        return --n;
     }
 }

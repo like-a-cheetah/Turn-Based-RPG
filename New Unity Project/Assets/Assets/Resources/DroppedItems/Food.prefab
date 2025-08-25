@@ -12,6 +12,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: Food
       objectReference: {fileID: 0}
+    - target: {fileID: 446001739561315129, guid: d52ff43d96cb62b47bc663150e264bb7,
+        type: 3}
+      propertyPath: weight
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 446001739561315129, guid: d52ff43d96cb62b47bc663150e264bb7,
+        type: 3}
+      propertyPath: chargeVal
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 446001739561315129, guid: d52ff43d96cb62b47bc663150e264bb7,
+        type: 3}
+      propertyPath: n
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 446001739561315129, guid: d52ff43d96cb62b47bc663150e264bb7,
+        type: 3}
+      propertyPath: itemType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 446001739561315130, guid: d52ff43d96cb62b47bc663150e264bb7,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -67,15 +87,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 446001739561315129, guid: d52ff43d96cb62b47bc663150e264bb7,
+    - target: {fileID: 446001739561315131, guid: d52ff43d96cb62b47bc663150e264bb7,
         type: 3}
-      propertyPath: weight
-      value: 40
-      objectReference: {fileID: 0}
-    - target: {fileID: 446001739561315129, guid: d52ff43d96cb62b47bc663150e264bb7,
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: eab87f10d2afa594c92ed3d29451b618,
         type: 3}
-      propertyPath: chargeVal
-      value: 2
+    - target: {fileID: 446001739561315131, guid: d52ff43d96cb62b47bc663150e264bb7,
+        type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 446001739561315128, guid: d52ff43d96cb62b47bc663150e264bb7,
         type: 3}
@@ -115,17 +136,6 @@ PrefabInstance:
     - target: {fileID: 446001739561315128, guid: d52ff43d96cb62b47bc663150e264bb7,
         type: 3}
       propertyPath: m_SpriteTilingProperty.drawMode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 446001739561315131, guid: d52ff43d96cb62b47bc663150e264bb7,
-        type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: eab87f10d2afa594c92ed3d29451b618,
-        type: 3}
-    - target: {fileID: 446001739561315131, guid: d52ff43d96cb62b47bc663150e264bb7,
-        type: 3}
-      propertyPath: m_WasSpriteAssigned
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []

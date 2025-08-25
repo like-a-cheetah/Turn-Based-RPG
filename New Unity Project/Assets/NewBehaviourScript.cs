@@ -15,6 +15,6 @@ public class NewBehaviourScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-       // System.Random(10)
+   //    Mathf.Move
     }
 }

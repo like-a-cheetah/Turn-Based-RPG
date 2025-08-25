@@ -143,10 +143,5 @@ public class GameManager : MonoBehaviour
 
             yield return enemy.attackWait;
         }
-
-        if (Enemy.canAttackEnemies.Count > 0)
-            yield return null;
-        else 
-            yield break;
     }
 }

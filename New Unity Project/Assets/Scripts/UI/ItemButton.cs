@@ -3,40 +3,76 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class ItemButton : MonoBehaviour
 {
-    protected Player player;
-    protected TextMeshProUGUI text;
-    public AudioSource itemUseSound;
+    private Item item;
 
-    [SerializeField]
-    EItem itemType;
+    private Button btn;
 
-    float itemN;
-    
-    //void Start()
-    //{
+    private Text text;
+    private Image fill;
+    private Image image;
+
+    private void Awake()
+    {
+        btn = GetComponent<Button>();
+
+        btn.onClick.AddListener(UseItem);
+
+        text = GetComponentInChildren<Text>();
+
+        item = GetComponent<Item>();
         
-    //}
-    
-    //protected virtual void Update()
-    //{
-    //    itemN = player.inven[itemType];
+        GameObject fillObj = transform.Find("Fill").gameObject;
+        if(fillObj)
+        {
+            fill = fillObj.GetComponent<Image>();
+        }
 
-    //    text.text = itemN.ToString();
+        GameObject imageObj = transform.Find("Image").gameObject;
+        if(imageObj)
+        {
+            image = imageObj.GetComponent<Image>();
+        }
+    }
 
-    //    if (itemN <= 0)
-    //    {
-    //        this.GetComponent<Button>().animator.SetTrigger("Normal");
-    //        this.GetComponent<Image>().color = Color.black;
-    //    }
-    //    else
-    //        this.GetComponent<Image>().color = Color.white;
-    //}
+    private void Start()
+    {
+        item.n = 0;
 
-    //protected virtual void UseItem()
-    //{
-    //    player.UseItem(itemType);
-    //}
+        SetNum(item.n);
+    }
+
+    public void ItemAdd(float itemN)
+    {
+        item.n += itemN;
+
+        SetNum(item.n);
+    }
+
+    public Item.EItem GetItemType()
+    {
+        return item.itemType;
+    }
+
+    private void UseItem()
+    {
+        if (item.n >= 1)
+        {
+            float n = item.UseItem();
+            
+            SetNum(n);
+        }
+    }
+
+    public void SetNum(float n)
+    {
+        fill.fillAmount = n;
+
+        text.text = n.ToString();
+
+        btn.interactable = n >= 1;
+    }
 }

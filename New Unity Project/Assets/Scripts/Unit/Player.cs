@@ -54,7 +54,11 @@ public class Player : MovingObject
 
     [SerializeField]
     public GameObject deathEffect;
-    
+
+    private UIManager uiManager;
+
+    private PlayerStat playerStat;
+
     protected override void Awake()
     {
         base.Awake();
@@ -64,6 +68,8 @@ public class Player : MovingObject
         enemyTile = ETile.Monster;
 
         enemyLayer = 1 << LayerMask.NameToLayer("Enemy");
+
+        stat = GetComponent<PlayerStat>();
     }
 
     protected override void Start()
@@ -87,6 +93,12 @@ public class Player : MovingObject
         //vertical = -1;
 
         blockingLayer = LayerMask.GetMask("Player");
+
+        uiManager = GetComponent<UIManager>();
+
+        playerStat = (PlayerStat)stat;
+
+        playerStat.InitManager(uiManager);
     }
 
     void Update()
@@ -207,8 +219,7 @@ public class Player : MovingObject
             Item newItem = col.GetComponent<Item>();
             if (newItem)
             {
-                inven.Add(newItem, newItem.chargeVal);
-                Destroy(col.gameObject);
+                uiManager.TakeItem(newItem);
             }
         }
     }
@@ -230,6 +241,7 @@ public class Player : MovingObject
     {
         inven[item]--;
 
-        item.Use();
+        item.UseItem
+            ();
     }
 }
